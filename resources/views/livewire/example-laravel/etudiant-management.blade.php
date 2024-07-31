@@ -180,7 +180,6 @@
                             <label for="dateninscrip" class="form-label">Date d'inscription:</label>
                             <input type="date" class="form-control" id="new-etudiant-dateninscrip" placeholder="Date d'inscription'e" name="dateninscrip">
                             <div class="text-danger" id="dateninscrip-warning"></div>
-
                         </div>
                     </div>
                 </form>
@@ -303,6 +302,7 @@ $(document).ready(function () {
     $(function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
+    
 
             $('#search_bar').on('keyup', function(){
                 var query = $(this).val();
@@ -547,6 +547,8 @@ function fetchEtudiantDetails(etudiantId) {
     $('#new-etudiant-phone').on('input', function () {
         $('#new-etudiant-wtsp').val($(this).val());
     });
+
+    
 
     $("#add-new-etudiant").click(function (e) {
         e.preventDefault();

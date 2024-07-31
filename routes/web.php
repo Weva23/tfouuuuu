@@ -200,6 +200,9 @@ Route::post('/sessions/search', [SessionsController::class, 'search6'])->name('s
 Route::get('sessions-management', SessionsController::class)->middleware('auth')->name('sessions-management');
 Route::post('/sessions/search', [SessionsController::class, 'search6'])->name('search6');
 
+Route::post('/sessions/searchetud', [SessionsController::class, 'search_listetud'])->name('search_listetud');
+
+
 
 
 Route::get('/paiements', [PaiementController::class, 'index'])->name('paiements.list_paiement');
@@ -245,6 +248,10 @@ Route::delete('etudiant/confirm_delete/{id}', [EtudiantController::class, 'confi
 // Route::get('check/email', [EtudiantController::class, 'checkEmail'])->name('check.email');
 Route::get('etudiants/check-nni', [EtudiantController::class, 'checkNni'])->name('check.nni');
 Route::get('etudiants/check-email', [EtudiantController::class, 'checkEmail'])->name('checkprof.email');
+Route::get('etudiants/check-phone', [EtudiantController::class, 'checkPhone'])->name('checketud.phone');
+Route::get('etudiants/check-wtsp', [EtudiantController::class, 'checkWtsp'])->name('checketud.wtsp');
+
+
 
 
 // Professeur routes
@@ -261,7 +268,8 @@ Route::get('/check-phone', [ProfesseurController::class, 'checkPhone'])->name('c
 Route::get('/check-email', [ProfesseurController::class, 'checkEmail'])->name('check.email');
 Route::get('/check-wtsp', [ProfesseurController::class, 'checkWtsp'])->name('check.wtsp');
 
-
+Route::get('professeur/delete/{id}', [ProfesseurController::class, 'deleteProfesseur'])->name('prof.delete');
+Route::delete('professeur/confirm_delete/{id}', [ProfesseurController::class, 'confirmDeleteProfesseur'])->name('prof.confirm_delete');
 
 
 Route::get('export/professeurs', [ExportController::class, 'exportProfesseurs'])->name('export.professeurs');
