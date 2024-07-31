@@ -16,7 +16,7 @@
                                         <!-- <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Reste à Payer</th> -->
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Mode de Paiement</th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date de Paiement</th>
-                                        <th class="text-secondary opacity-7"></th>
+                                        <th class="text-secondary opacity-7">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -32,6 +32,9 @@
         <td>{{ $paiement->montant_paye }}</td>
         <td>{{ $paiement->mode->nom }}</td>
         <td>{{ $paiement->date_paiement }}</td>
+        <td><a href="{{ route('generateProfReceipt', ['sessionId' => $paiement->session_id, 'profId' => $paiement->prof_id]) }}" class="btn btn-info" data-toggle="tooltip" title="Imprimer le reçu">
+                <i class="material-icons opacity-10">download</i></a></td>
+        </tr>
     </tr>
 @endforeach
 

@@ -126,52 +126,53 @@ class EtudiantController extends Component
     }
 
 
+    
     public function store(Request $request)
-    {
-        $request->validate([
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'nni' => 'required|digits:10|string|gt:0|unique:etudiants,nni',
-            'nomprenom' => 'required|string',
-            'diplome' => 'nullable|string',
-            'genre' => 'required|string',
-            'lieunaissance' => 'nullable|string',
-            'adress' => 'nullable|string',
-            'datenaissance' => 'nullable|date',
-            'dateninscrip' => 'required|date',
-            'email' => 'nullable|email|unique:etudiants,email',
-            'phone' => 'required|digits:8|integer|gt:0',
-            'wtsp' => 'nullable|integer',
-            'country_id' => 'required|exists:countries,id',
+{
+    $request->validate([
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        'nni' => 'required|digits:10|string|gt:0|unique:etudiants,nni',
+        'nomprenom' => 'required|string',
+        'diplome' => 'nullable|string',
+        'genre' => 'required|string',
+        'lieunaissance' => 'nullable|string',
+        'adress' => 'nullable|string',
+        'datenaissance' => 'nullable|date|before_or_equal:today', // Validation ajoutée pour la date
+        'email' => 'nullable|email|unique:etudiants,email',
+        'phone' => 'required|digits:8|integer|gt:0',
+        'wtsp' => 'nullable|integer',
+        'country_id' => 'required|exists:countries,id',
+    ], [
+        'datenaissance.before_or_equal' => 'La date de naissance ne peut pas être une date future.', // Message d'erreur personnalisé
+    ]);
+
+    try {
+        $imageName = $request->hasFile('image') ? time() . '.' . $request->image->extension() : null;
+
+        if ($imageName) {
+            $request->image->move(public_path('images'), $imageName);
+        }
+
+        $etudiant = Etudiant::create([
+            'image' => $imageName,
+            'nni' => $request->nni,
+            'nomprenom' => $request->nomprenom,
+            'diplome' => $request->diplome,
+            'genre' => $request->genre,
+            'lieunaissance' => $request->lieunaissance,
+            'adress' => $request->adress,
+            'datenaissance' => $request->datenaissance,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'wtsp' => $request->wtsp,
+            'country_id' => $request->country_id,
         ]);
 
-        try {
-            $imageName = $request->hasFile('image') ? time() . '.' . $request->image->extension() : null;
-
-            if ($imageName) {
-                $request->image->move(public_path('images'), $imageName);
-            }
-
-            $etudiant = Etudiant::create([
-                'image' => $imageName,
-                'nni' => $request->nni,
-                'nomprenom' => $request->nomprenom,
-                'diplome' => $request->diplome,
-                'genre' => $request->genre,
-                'lieunaissance' => $request->lieunaissance,
-                'adress' => $request->adress,
-                'datenaissance' => $request->datenaissance,
-                'dateninscrip' => $request->dateninscrip,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'wtsp' => $request->wtsp,
-                'country_id' => $request->country_id,
-            ]);
-
-            return response()->json(['success' => 'Étudiant créé avec succès', 'etudiant' => $etudiant]);
-        } catch (\Throwable $th) {
-            return response()->json(['error' => $th->getMessage()], 500);
-        }
+        return response()->json(['success' => 'Étudiant créé avec succès', 'etudiant' => $etudiant]);
+    } catch (\Throwable $th) {
+        return response()->json(['error' => $th->getMessage()], 500);
     }
+}
 
     
 

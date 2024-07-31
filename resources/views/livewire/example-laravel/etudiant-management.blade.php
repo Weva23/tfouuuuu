@@ -89,6 +89,7 @@
 
 
 <!-- Add Student Modal -->
+<!-- Add Student Modal -->
 <div class="modal fade" id="etudiantAddModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content" style="width: 40cm;">
@@ -144,16 +145,11 @@
                             </div>
                             <div class="text-danger" id="genre-warning"></div>
                         </div>
-                        <div class="col-md-6 col-lg-3">
-                            <label for="datenaissance" class="form-label">Date de naissance:</label>
-                            <input type="date" class="form-control" id="new-etudiant-datenaissance" placeholder="Date de naissance" name="datenaissance">
-                        </div>
-                        <!-- <div class="col-md-6">
-                            <label for="dateninscrip" class="form-label">Date d'inscription':</label>
-                            <input type="date" class="form-control" id="new-etudiant-dateninscrip" placeholder="Date d'inscription'e" name="dateninscrip">
-                            <div class="text-danger" id="dateninscrip-warning"></div>
-
-                        </div> -->
+                        <div class="col-md-3">
+    <label for="datenaissance" class="form-label">Date de naissance:</label>
+    <input type="date" class="form-control" id="new-etudiant-datenaissance" placeholder="Date de naissance" name="datenaissance">
+    <div class="text-danger" id="datenaissance-warning"></div> <!-- Zone pour le message d'erreur -->
+</div>
                     </div>
                     <div class="row mb-4">
                         <div class="col-md-6 col-lg-3">
@@ -464,164 +460,158 @@ function fetchEtudiantDetails(etudiantId) {
                 return exists;
             }
 
-    function validateForm(formId, warnings, id = null) {
-        let isValid = true;
-        for (let field in warnings) {
-            const input = $(formId + ' #' + field);
-            const warning = $(warnings[field]);
+            function validateForm(formId, warnings, id = null) {
+    let isValid = true;
+    for (let field in warnings) {
+        const input = $(formId + ' #' + field);
+        const warning = $(warnings[field]);
 
-            if (input.length === 0 && field !== 'genre' && field !== 'new-etudiant-email' && field !== 'etudiant-email' && field !== 'new-etudiant-wtsp' && field !== 'etudiant-wtsp') {
-                console.warn(`No input found with ID: ${field}`);
-                continue;
-            }
+        if (input.length === 0 && field !== 'genre' && field !== 'new-etudiant-email' && field !== 'etudiant-email') {
+            console.warn(`No input found with ID: ${field}`);
+            continue;
+        }
 
-            if (field === 'genre') {
-                if (!$('input[name="genre"]:checked').val()) {
-                    warning.text('Ce champ est requis.');
-                    isValid = false;
-                } else {
-                    warning.text('');
-                }
-            } else if (input.attr('type') === 'radio') {
-                if (!$('input[name="' + field + '"]:checked').val()) {
-                    warning.text('Ce champ est requis.');
-                    isValid = false;
-                } else {
-                    warning.text('');
-                }
-            } else if (input.val().trim() === '') {
-                if (field !== 'new-etudiant-email' && field !== 'etudiant-email') {
-                    warning.text('Ce champ est requis.');
-                    isValid = false;
-                } else {
-                    warning.text('');
-                }
-            } else if (field === 'new-etudiant-phone' || field === 'etudiant-phone') {
-                if (!/^\d{8}$/.test(input.val())) {
-                    warning.text('Ce champ doit comporter 8 chiffres.');
-                    isValid = false;
-                } else if (phoneExists(input.val(), id)) {
-                            warning.text('Ce numéro de téléphone existe déjà.');
-                            isValid = false;
-                        } else {
-                    warning.text('');
-                }
-            } else if (field === 'new-etudiant-nni' || field === 'etudiant-nni') {
-                if (!/^\d{10}$/.test(input.val())) {
-                    warning.text('Ce champ doit comporter 10 chiffres.');
-                    isValid = false;
-                } else if (nniExists(input.val(), id)) {
-                    warning.text('Cet NNI existe déjà.');
-                    isValid = false;
-                } else {
-                    warning.text('');
-                }
-            } else if (field === 'new-etudiant-email' || field === 'etudiant-email') {
-                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailPattern.test(input.val())) {
-                    warning.text('Veuillez entrer une adresse e-mail valide.');
-                    isValid = false;
-                } else if (emailExists(input.val(), id)) {
-                    warning.text('Cet e-mail existe déjà.');
-                    isValid = false;
-                } else {
-                    warning.text('');
-                }
-            } else if ((field === 'new-etudiant-wtsp' || field === 'etudiant-wtsp') && input.val().trim() !== '') {
-                        if (!/^\d+$/.test(input.val())) {
-                            warning.text('Veuillez entrer un numéro WhatsApp valide.');
-                            isValid = false;
-                        } else if (wtspExists(input.val(), id)) {
-                            warning.text('Ce numéro WhatsApp existe déjà.');
-                            isValid = false;
-                        } else {
-                            warning.text('');
-                        }
-                    } else {
+        if (field === 'genre') {
+            if (!$('input[name="genre"]:checked').val()) {
+                warning.text('Ce champ est requis.');
+                isValid = false;
+            } else {
                 warning.text('');
             }
+        } else if (field === 'datenaissance') {
+            const today = new Date().toISOString().split('T')[0]; // Date d'aujourd'hui au format YYYY-MM-DD
+            if (input.val() > today) {
+                warning.text('La date de naissance ne peut pas être une date future.');
+                isValid = false;
+            } else {
+                warning.text('');
+            }
+        } else if (input.attr('type') === 'radio') {
+            if (!$('input[name="' + field + '"]:checked').val()) {
+                warning.text('Ce champ est requis.');
+                isValid = false;
+            } else {
+                warning.text('');
+            }
+        } else if (input.val().trim() === '') {
+            if (field !== 'new-etudiant-email' && field !== 'etudiant-email') {
+                warning.text('Ce champ est requis.');
+                isValid = false;
+            } else {
+                warning.text('');
+            }
+        } else if (field === 'new-etudiant-phone' || field === 'etudiant-phone') {
+            if (!/^\d{8}$/.test(input.val())) {
+                warning.text('Ce champ doit comporter 8 chiffres.');
+                isValid = false;
+            } else {
+                warning.text('');
+            }
+        } else if (field === 'new-etudiant-nni' || field === 'etudiant-nni') {
+            if (!/^\d{10}$/.test(input.val())) {
+                warning.text('Ce champ doit comporter 10 chiffres.');
+                isValid = false;
+            } else if (nniExists(input.val(), id)) {
+                warning.text('Cet NNI existe déjà.');
+                isValid = false;
+            } else {
+                warning.text('');
+            }
+        } else if (field === 'new-etudiant-email' || field === 'etudiant-email') {
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(input.val())) {
+                warning.text('Veuillez entrer une adresse e-mail valide.');
+                isValid = false;
+            } else if (emailExists(input.val(), id)) {
+                warning.text('Cet e-mail existe déjà.');
+                isValid = false;
+            } else {
+                warning.text('');
+            }
+        } else {
+            warning.text('');
         }
-        return isValid;
     }
+    return isValid;
+}
+
 
     $('#new-etudiant-phone').on('input', function () {
         $('#new-etudiant-wtsp').val($(this).val());
     });
 
-    
-
     $("#add-new-etudiant").click(function (e) {
-        e.preventDefault();
+    e.preventDefault();
 
-        if (!validateForm('#etudiant-add-form', {
-            'new-etudiant-nni': '#nni-warning',
-            'new-etudiant-nomprenom': '#nomprenom-warning',
-            'new-etudiant-country_id': '#country_id-warning',
-            'new-etudiant-phone': '#phone-warning',
-            'new-etudiant-email': '#email-warning',
-            'genre': '#genre-warning',
-            'new-etudiant-wtsp': '#wtsp-warning',
-            'new-etudiant-dateninscrip': '#dateninscrip-warning'
+    if (!validateForm('#etudiant-add-form', {
+        'new-etudiant-nni': '#nni-warning',
+        'new-etudiant-nomprenom': '#nomprenom-warning',
+        'new-etudiant-country_id': '#country_id-warning',
+        'new-etudiant-phone': '#phone-warning',
+        'new-etudiant-email': '#email-warning',
+        'datenaissance': '#datenaissance-warning', // Ajout pour date de naissance
+        'genre': '#genre-warning'
+    })) {
+        return;
+    }
 
+    let form = $('#etudiant-add-form')[0];
+    let data = new FormData(form);
 
-        })) {
-            return;
-        }
-
-        let form = $('#etudiant-add-form')[0];
-        let data = new FormData(form);
-
-        $.ajax({
-            url: "{{ route('etudiant.store') }}",
-            type: "POST",
-            data: data,
-            dataType: "JSON",
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                if (response.errors) {
-                    var errorMsg = '';
-                    $.each(response.errors, function (field, errors) {
-                        $.each(errors, function (index, error) {
-                            errorMsg += error + '<br>';
-                        });
-                    });
-                    iziToast.error({
-                        message: errorMsg,
-                        position: 'topRight'
-                    });
-                } else {
-                    iziToast.success({
-                        message: response.success,
-                        position: 'topRight'
-                    });
-                    $('#etudiantAddModal').modal('hide');
-                    setTimeout(function () {
-                        location.reload();
-                    }, 1000);
-                    addStudentToTable(response.etudiant);
-                }
-            },
-            error: function (xhr, status, error) {
+    $.ajax({
+        url: "{{ route('etudiant.store') }}",
+        type: "POST",
+        data: data,
+        dataType: "JSON",
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            if (response.errors) {
                 var errorMsg = '';
-                if (xhr.responseJSON && xhr.responseJSON.error) {
-                    errorMsg = xhr.responseJSON.error;
-                } else if (xhr.responseJSON && xhr.responseJSON.errors) {
-                    $.each(xhr.responseJSON.errors, function (field, errors) {
-                        $.each(errors, function (index, error) {
-                            errorMsg += error + '<br>';
-                        });
+                $.each(response.errors, function (field, errors) {
+                    $.each(errors, function (index, error) {
+                        // Affichage des erreurs au-dessus des champs
+                        $('#' + field + '-warning').html(error);
                     });
-                } else {
-                    errorMsg = 'Une erreur est survenue : ' + error;
-                }
+                });
                 iziToast.error({
                     message: errorMsg,
                     position: 'topRight'
                 });
+            } else {
+                iziToast.success({
+                    message: response.success,
+                    position: 'topRight'
+                });
+                $('#etudiantAddModal').modal('hide');
+                setTimeout(function () {
+                    location.reload();
+                }, 1000);
+                addStudentToTable(response.etudiant);
             }
-        });
+        },
+        error: function (xhr, status, error) {
+            var errorMsg = '';
+            if (xhr.responseJSON && xhr.responseJSON.error) {
+                errorMsg = xhr.responseJSON.error;
+            } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                $.each(xhr.responseJSON.errors, function (field, errors) {
+                    $.each(errors, function (index, error) {
+                        // Affichage des erreurs au-dessus des champs
+                        $('#' + field + '-warning').html(error);
+                    });
+                });
+            } else {
+                errorMsg = 'Une erreur est survenue : ' + error;
+            }
+            iziToast.error({
+                message: errorMsg,
+                position: 'topRight'
+            });
+        }
     });
+});
+
 
     function addStudentToTable(etudiant) {
         let newRow = `<tr>

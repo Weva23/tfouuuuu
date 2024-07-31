@@ -17,6 +17,7 @@
             border: 1px solid #ddd;
             border-radius: 10px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
         .header {
             text-align: center;
@@ -73,14 +74,32 @@
             font-size: 16px;
             color: #555;
         }
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+        }
+        .receipt-number {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 14px;
+            color: #777;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+    <img src="public/img/ipf.jpg" class="navbar-brand-img h-100" alt="main_logo">
+        <div class="receipt-number">
+            <p>Reçu No: <span>00250</span></p>
+        </div>
         <div class="header">
-            <h1>Reçu de Paiement Professeur</h1>
-            <!-- <p>Date : {{ $date }}</p>
-            <p>Heure : {{ $heure }}</p> -->
+            <h1>Reçu</h1>
+            <p>Institut Pédagogique de Formation et de Recherche Scientifique</p>
+            <p>Tél: 4900 5989</p>
         </div>
         <div class="details">
             <p><strong>Nom et Prénom :</strong> {{ $nom_prenom }}</p>
@@ -97,7 +116,6 @@
         <div class="footer">
             <p><strong>Par :</strong> {{ $par }}</p>
             <p>Date : {{ $date }}   {{ $heure }}</p>
-            <!-- <p>Heure : {{ $heure }}</p> -->
             <p><strong>Signature :</strong> {{ $signature }}</p>
         </div>
     </div>

@@ -24,12 +24,16 @@ class SessionsController extends Component
 {
     public function list_session()
     {
-        $sessions = Sessions::with('etudiants','professeurs', 'formation')->paginate(4);
+        $sessions = Sessions::with('etudiants', 'professeurs', 'formation')->paginate(4);
         $formations = Formations::all();
         $modes_paiement = ModePaiement::all();
         $typeymntprofs = Typeymntprofs::all();
-        return view('livewire.example-laravel.sessions-management', compact('sessions', 'formations', 'modes_paiement', 'typeymntprofs'));
+        $paiements = Paiement::with('etudiant', 'session.formation', 'mode')->get();
+        $paiementsProf = PaiementProf::with('professeur', 'session.formation', 'mode')->get();
+    
+        return view('livewire.example-laravel.sessions-management', compact('sessions', 'formations', 'modes_paiement', 'typeymntprofs', 'paiements', 'paiementsProf'));
     }
+    
 
 
     public function getProfDetails($sessionId, $profId)
@@ -513,21 +517,30 @@ class SessionsController extends Component
         try {
             $etudiant = Etudiant::findOrFail($etudiantId);
             $session = Sessions::findOrFail($sessionId);
-            $paiement = Paiement::where('etudiant_id', $etudiantId)
+
+            // Récupérer tous les paiements pour l'étudiant et la session donnés, triés par date de paiement
+            $paiements = Paiement::where('etudiant_id', $etudiantId)
                 ->where('session_id', $sessionId)
-                ->firstOrFail();
+                ->orderBy('date_paiement', 'desc')
+                ->get();
 
-            $montantPaye = $paiement->montant_paye;
-            $prixReel = $paiement->prix_reel;
+            if ($paiements->isEmpty()) {
+                return response()->json(['error' => 'Aucun paiement trouvé pour cet étudiant et cette session'], 404);
+            }
+
+            // Utiliser le dernier paiement
+            $dernierPaiement = $paiements->first();
+            $montantPaye = $paiements->sum('montant_paye');
+            $prixReel = $dernierPaiement->prix_reel;
             $resteAPayer = $prixReel - $montantPaye;
-            $modePaiement = $paiement->mode->nom; // Access the mode name via the relationship
+            $modePaiement = $dernierPaiement->mode->nom;
 
-            // Convert date_paiement to Carbon instance and set timezone to Africa/Nouakchott
-            $datePaiement = Carbon::parse($paiement->date_paiement)->setTimezone('Africa/Nouakchott');
+            // Convertir date_paiement en instance Carbon et définir le fuseau horaire sur Africa/Nouakchott
+            $datePaiement = Carbon::parse($dernierPaiement->date_paiement)->setTimezone('Africa/Nouakchott');
             $datePaiementFormatted = $datePaiement->format('d/m/Y');
             $heurePaiement = $datePaiement->format('H:i');
 
-            // Convert dates to DateTime objects
+            // Convertir les dates en objets DateTime
             $dateDebut = new \DateTime($session->date_debut);
             $dateFin = new \DateTime($session->date_fin);
 
@@ -541,11 +554,11 @@ class SessionsController extends Component
                 'reste_a_payer' => $resteAPayer,
                 'Mode_peiment' => $modePaiement,
                 'formation' => $session->nom,
-                'date_debut' => $dateDebut->format('d/m/Y'),  // Ensure date is formatted correctly
-                'date_fin' => $dateFin->format('d/m/Y'),      // Ensure date is formatted correctly
+                'date_debut' => $dateDebut->format('d/m/Y'),
+                'date_fin' => $dateFin->format('d/m/Y'),
                 'date_paiement' => $datePaiementFormatted,
                 'heure_paiement' => $heurePaiement,
-                'par' => Auth::user()->name,  // Get the name of the authenticated user
+                'par' => Auth::user()->name,
                 'signature' => 'Signature Autorisée',
             ];
 
@@ -564,22 +577,31 @@ class SessionsController extends Component
         try {
             $professeur = Professeur::findOrFail($profId);
             $session = Sessions::findOrFail($sessionId);
-            $paiementProf = PaiementProf::where('prof_id', $profId)
+
+            // Récupérer tous les paiements pour le professeur et la session donnés, triés par date de paiement
+            $paiementsProf = PaiementProf::where('prof_id', $profId)
                 ->where('session_id', $sessionId)
-                ->firstOrFail();
+                ->orderBy('date_paiement', 'desc')
+                ->get();
 
-            $montantPaye = $paiementProf->montant_paye;
-            $montantAPaye = $paiementProf->montant_a_paye;
+            if ($paiementsProf->isEmpty()) {
+                return response()->json(['error' => 'Aucun paiement trouvé pour ce professeur et cette session'], 404);
+            }
+
+            // Utiliser le dernier paiement
+            $dernierPaiementProf = $paiementsProf->first();
+            $montantPaye = $paiementsProf->sum('montant_paye');
+            $montantAPaye = $dernierPaiementProf->montant_a_paye;
             $resteAPayer = $montantAPaye - $montantPaye;
-            $modePaiement = $paiementProf->mode ? $paiementProf->mode->nom : 'N/A';
-            $typePaiement = $paiementProf->typeymntprofs ? $paiementProf->typeymntprofs->type : 'N/A';
+            $modePaiement = $dernierPaiementProf->mode ? $dernierPaiementProf->mode->nom : 'N/A';
+            $typePaiement = $dernierPaiementProf->typeymntprofs ? $dernierPaiementProf->typeymntprofs->type : 'N/A';
 
-            // Convert date_paiement to Carbon instance and set timezone to Africa/Nouakchott
-            $datePaiement = Carbon::parse($paiementProf->date_paiement)->setTimezone('Africa/Nouakchott');
+            // Convertir date_paiement en instance Carbon et définir le fuseau horaire sur Africa/Nouakchott
+            $datePaiement = Carbon::parse($dernierPaiementProf->date_paiement)->setTimezone('Africa/Nouakchott');
             $datePaiementFormatted = $datePaiement->format('d/m/Y');
             $heurePaiement = $datePaiement->format('H:i');
 
-            // Convert dates to DateTime objects
+            // Convertir les dates en objets DateTime
             $dateDebut = new \DateTime($session->date_debut);
             $dateFin = new \DateTime($session->date_fin);
 
@@ -610,6 +632,7 @@ class SessionsController extends Component
             return response()->json(['error' => 'Erreur lors de la génération du reçu: ' . $e->getMessage()], 500);
         }
     }
+
     
     public function searchStudentByPhone(Request $request)
     {

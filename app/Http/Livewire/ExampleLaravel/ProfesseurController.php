@@ -84,7 +84,6 @@ class ProfesseurController extends Component
         $exists = $query->exists();
         return response()->json(['exists' => $exists]);
     }
-
     public function store(Request $request)
     {
         $request->validate([
@@ -94,22 +93,24 @@ class ProfesseurController extends Component
             'genre' => 'required|string',
             'lieunaissance' => 'nullable|string',
             'adress' => 'nullable|string',
-            'datenaissance' => 'nullable|date',
+            'datenaissance' => 'nullable|date|before_or_equal:today', // Validation ajoutée pour la date
             'dateninscrip' => 'required|date',
             'email' => 'nullable|email|unique:professeurs,email',
             'phone' => 'required|digits:8|integer|gt:0|unique:professeurs,phone',
             'wtsp' => 'nullable|integer|unique:professeurs,wtsp',
             'country_id' => 'required|exists:countries,id',
             'type_id' => 'required|exists:typeymntprofs,id',
+        ], [
+            'datenaissance.before_or_equal' => 'La date de naissance ne peut pas être une date future.', // Message d'erreur personnalisé
         ]);
-
+    
         try {
             $imageName = $request->hasFile('image') ? time() . '.' . $request->image->extension() : null;
-
+    
             if ($imageName) {
                 $request->image->move(public_path('images'), $imageName);
             }
-
+    
             $prof = Professeur::create([
                 'image' => $imageName,
                 'nomprenom' => $request->nomprenom,
@@ -125,7 +126,7 @@ class ProfesseurController extends Component
                 'country_id' => $request->country_id,
                 'type_id' => $request->type_id,
             ]);
-
+    
             return response()->json(['success' => 'Professeur créé avec succès', 'prof' => $prof->load('country', 'type')]);
         } catch (ValidationException $e) {
             return response()->json(['error' => $e->errors()], 422);
@@ -134,6 +135,7 @@ class ProfesseurController extends Component
             return response()->json(['error' => $th->getMessage()], 500);
         }
     }
+    
 
     public function update(Request $request, $id)
     {

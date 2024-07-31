@@ -224,6 +224,11 @@ Route::get('/search3', [ContenusFormationController::class, 'search3'])->name('s
 
 
 
+// Route for generating student receipt
+Route::get('/sessions/{sessionId}/generateReceipt/{etudiantId}', [SessionsController::class, 'generateReceipt'])->name('generateReceipt');
+
+// Route for generating professor receipt
+Route::get('/sessions/{sessionId}/generateProfReceipt/{profId}', [SessionsController::class, 'generateProfReceipt'])->name('generateProfReceipt');
 
 
 Route::get('/etudiants/{etudiantId}/details', [EtudiantController::class, 'getEtudiantDetails']);

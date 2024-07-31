@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Reçu de Paiement Étudiant</title>
+    <title>Reçu</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -76,11 +76,21 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- <div class="container">
         <div class="header">
             <h1>Reçu de Paiement Étudiant</h1>
             <!-- <p>Date : {{ $date }}</p>
             <p>Heure : {{ $heure }}</p> -->
+        </div> -->
+        <div class="container">
+    <img src="public/img/ipf.jpg" class="navbar-brand-img h-100" alt="main_logo">
+        <div class="receipt-number">
+            <p>Reçu No: <span>00250</span></p>
+        </div>
+        <div class="header">
+            <h1>Reçu</h1>
+            <p>Institut Pédagogique de Formation et de Recherche Scientifique</p>
+            <p>Tél: 4900 5989</p>
         </div>
         <div class="details" >
             <div style="margin: 20px;">
