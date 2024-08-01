@@ -170,17 +170,10 @@
                             <div class="text-danger" id="genre-warning"></div>
                         </div>
                         <div class="col-md-6 col-lg-3">
-    <label for="datenaissance" class="form-label">Date de naissance:</label>
-    <div class="text-danger" id="datenaissance-warning"></div> <!-- Zone pour le message d'erreur -->
-    <input type="date" class="form-control" id="new-prof-datenaissance" placeholder="Date de naissance" name="datenaissance">
-</div>
-
-                        <!-- <div class="col-md-6 col-lg-3">
-                            <label for="dateninscrip" class="form-label">Date d'inscription:</label>
-                            <input type="date" class="form-control" id="new-prof-dateninscrip" placeholder="Date d'inscription" name="dateninscrip">
-                            <div class="text-danger" id="dateninscrip-warning"></div>
-
-                        </div> -->
+                            <label for="datenaissance" class="form-label">Date de naissance:</label>
+                            <div class="text-danger" id="datenaissance-warning"></div> <!-- Zone pour le message d'erreur -->
+                            <input type="date" class="form-control" id="new-prof-datenaissance" placeholder="Date de naissance" name="datenaissance">
+                        </div>
                     </div>
                     <div class="row mb-4">
                         <div class="col-md-6 col-lg-3">
@@ -190,12 +183,12 @@
                         </div>
                         <div class="col-md-6 col-lg-2">
                             <label for="phone" class="form-label required">Portable:</label>
-                            <input type="text" class="form-control" id="new-prof-phone" placeholder="Portable" name="phone">
+                            <input type="number" class="form-control" id="new-prof-phone" placeholder="Portable" name="phone">
                             <div class="text-danger" id="phone-warning"></div>
                         </div>
                         <div class="col-md-6 col-lg-2">
                             <label for="wtsp" class="form-label">WhatsApp:</label>
-                            <input type="text" class="form-control" id="new-prof-wtsp" placeholder="WhatsApp" name="wtsp">
+                            <input type="number" class="form-control" id="new-prof-wtsp" placeholder="WhatsApp" name="wtsp">
                             <div class="text-danger" id="wtsp-warning"></div>
                         </div>
                         <div class="col-md-6 col-lg-2">
@@ -203,10 +196,10 @@
                             <input type="text" class="form-control" id="new-prof-adress" placeholder="Adresse" name="adress">
                         </div>
                         <div class="col-md-6 col-lg-3">
-    <label for="dateninscrip" class="form-label">Date d'inscription:</label>
-    <input type="date" class="form-control" id="new-prof-dateninscrip" placeholder="Date d'inscription" name="dateninscrip">
-    <div class="text-danger" id="dateninscrip-warning"></div>
-</div>
+                            <label for="dateninscrip" class="form-label">Date d'inscription:</label>
+                            <input type="date" class="form-control" id="new-prof-dateninscrip" placeholder="Date d'inscription" name="dateninscrip">
+                            <div class="text-danger" id="dateninscrip-warning"></div>
+                        </div>
 
                     </div>
                 </form>
@@ -284,10 +277,10 @@
                             <div class="text-danger" id="edit-genre-warning"></div>
                         </div>
                         <div class="col-md-6 col-lg-3">
-    <label for="datenaissance" class="form-label">Date de naissance:</label>
-    <div class="text-danger" id="datenaissance-warning"></div> <!-- Zone pour le message d'erreur -->
-    <input type="date" class="form-control" id="new-prof-datenaissance" placeholder="Date de naissance" name="datenaissance">
-</div>
+                            <label for="datenaissance" class="form-label">Date de naissance:</label>
+                            <div class="text-danger" id="datenaissance-warning"></div> <!-- Zone pour le message d'erreur -->
+                            <input type="date" class="form-control" id="new-prof-datenaissance" placeholder="Date de naissance" name="datenaissance">
+                        </div>
 
                     </div>
                     <div class="row mb-4">
@@ -298,12 +291,12 @@
                         </div>
                         <div class="col-md-6 col-lg-3">
                             <label for="phone" class="form-label required">Portable:</label>
-                            <input type="text" class="form-control" id="prof-phone" placeholder="Portable" name="phone">
+                            <input type="number" class="form-control" id="prof-phone" placeholder="Portable" name="phone">
                             <div class="text-danger" id="edit-phone-warning"></div>
                         </div>
                         <div class="col-md-6 col-lg-3">
                             <label for="wtsp" class="form-label">WhatsApp:</label>
-                            <input type="text" class="form-control" id="prof-wtsp" placeholder="WhatsApp" name="wtsp">
+                            <input type="number" class="form-control" id="prof-wtsp" placeholder="WhatsApp" name="wtsp">
                             <div class="text-danger" id="edit-wtsp-warning"></div>
                         </div>
                         <div class="col-md-6 col-lg-3">
@@ -464,156 +457,159 @@
                 });
                 return exists;
             }
-            document.addEventListener('DOMContentLoaded', function() {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('new-prof-dateninscrip').value = today;
-});
+            // document.addEventListener('DOMContentLoaded', function() {
+            //     const today = new Date().toISOString().split('T')[0];
+            //     document.getElementById('new-prof-dateninscrip').value = today;
+            // });
 
             function validateForm(formId, warnings, profId = null) {
-    let isValid = true;
+                let isValid = true;
 
-    for (let field in warnings) {
-        const input = $(formId + ' #' + field);
-        const warning = $(warnings[field]);
+                for (let field in warnings) {
+                    const input = $(formId + ' #' + field);
+                    const warning = $(warnings[field]);
 
-        if (input.length === 0 && field !== 'genre' && field !== 'new-prof-email' && field !== 'prof-email' && field !== 'new-prof-wtsp' && field !== 'prof-wtsp') {
-            console.warn(`No input found with ID: ${field}`);
-            continue;
-        }
+                    if (input.length === 0 && field !== 'genre' && field !== 'new-prof-email' && field !== 'prof-email' && field !== 'new-prof-wtsp' && field !== 'prof-wtsp') {
+                        console.warn(`No input found with ID: ${field}`);
+                        continue;
+                    }
 
-        if (field === 'genre') {
-            if (!$('input[name="genre"]:checked').val()) {
-                warning.text('Ce champ est requis.');
-                isValid = false;
-            } else {
-                warning.text('');
-            }
-        } else if (field === 'datenaissance') {
-            const today = new Date().toISOString().split('T')[0]; // Date d'aujourd'hui au format YYYY-MM-DD
-            if (input.val() > today) {
-                warning.text('La date de naissance ne peut pas être une date future.');
-                isValid = false;
-            } else {
-                warning.text('');
-            }
-        } else if (input.attr('type') === 'radio') {
-            if (!$('input[name="' + field + '"]:checked').val()) {
-                warning.text('Ce champ est requis.');
-                isValid = false;
-            } else {
-                warning.text('');
-            }
-        } else if (input.val().trim() === '' && field !== 'new-prof-email' && field !== 'prof-email' && field !== 'new-prof-wtsp' && field !== 'prof-wtsp') {
-            warning.text('Ce champ est requis.');
-            isValid = false;
-        } else if (field === 'new-prof-phone' || field === 'prof-phone') {
-            if (!/^\d{8}$/.test(input.val())) {
-                warning.text('Ce champ doit comporter 8 chiffres.');
-                isValid = false;
-            } else if (phoneExists(input.val(), profId)) {
-                warning.text('Ce numéro de téléphone existe déjà.');
-                isValid = false;
-            } else {
-                warning.text('');
-            }
-        } else if ((field === 'new-prof-email' || field === 'prof-email') && input.val().trim() !== '') {
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailPattern.test(input.val())) {
-                warning.text('Veuillez entrer une adresse e-mail valide.');
-                isValid = false;
-            } else if (emailExists(input.val(), profId)) {
-                warning.text('Cet e-mail existe déjà.');
-                isValid = false;
-            } else {
-                warning.text('');
-            }
-        } else if ((field === 'new-prof-wtsp' || field === 'prof-wtsp') && input.val().trim() !== '') {
-            if (!/^\d+$/.test(input.val())) {
-                warning.text('Veuillez entrer un numéro WhatsApp valide.');
-                isValid = false;
-            } else if (wtspExists(input.val(), profId)) {
-                warning.text('Ce numéro WhatsApp existe déjà.');
-                isValid = false;
-            } else {
-                warning.text('');
-            }
-        } else {
-            warning.text('');
-        }
-    }
+                    if (field === 'genre') {
+                        if (!$('input[name="genre"]:checked').val()) {
+                            warning.text('Ce champ est requis.');
+                            isValid = false;
+                        } else {
+                            warning.text('');
+                        }
+                    } else if (field === 'datenaissance') {
+                        const today = new Date().toISOString().split('T')[0]; // Date d'aujourd'hui au format YYYY-MM-DD
+                        if (input.val() > today) {
+                            warning.text('La date de naissance ne peut pas être une date future.');
+                            isValid = false;
+                        } else {
+                            warning.text('');
+                        }
+                    } else if (input.attr('type') === 'radio') {
+                        if (!$('input[name="' + field + '"]:checked').val()) {
+                            warning.text('Ce champ est requis.');
+                            isValid = false;
+                        } else {
+                            warning.text('');
+                        }
+                    } else if (input.val().trim() === '' && field !== 'new-prof-email' && field !== 'prof-email' && field !== 'new-prof-wtsp' && field !== 'prof-wtsp') {
+                        warning.text('Ce champ est requis.');
+                        isValid = false;
+                    } else if (field === 'new-prof-phone' || field === 'prof-phone') {
+                        if (!/^\d{8}$/.test(input.val())) {
+                            warning.text('Ce champ doit comporter 8 chiffres.');
+                            isValid = false;
+                        } else if (phoneExists(input.val(), profId)) {
+                            warning.text('Ce numéro de téléphone existe déjà.');
+                            isValid = false;
+                        } else {
+                            warning.text('');
+                        }
+                    } else if ((field === 'new-prof-email' || field === 'prof-email') && input.val().trim() !== '') {
+                        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        if (!emailPattern.test(input.val())) {
+                            warning.text('Veuillez entrer une adresse e-mail valide.');
+                            isValid = false;
+                        } else if (emailExists(input.val(), profId)) {
+                            warning.text('Cet e-mail existe déjà.');
+                            isValid = false;
+                        } else {
+                            warning.text('');
+                        }
+                    } else if ((field === 'new-prof-wtsp' || field === 'prof-wtsp') && input.val().trim() !== '') {
+                        if (!/^\d+$/.test(input.val())) {
+                            warning.text('Veuillez entrer un numéro WhatsApp valide.');
+                            isValid = false;
+                        } else if (wtspExists(input.val(), profId)) {
+                            warning.text('Ce numéro WhatsApp existe déjà.');
+                            isValid = false;
+                        } else {
+                            warning.text('');
+                        }
+                    } else {
+                        warning.text('');
+                    }
+                }
 
-    return isValid;
-}
-
-$('#new-prof-phone').on('input', function () {
-    $('#new-prof-wtsp').val($(this).val());
-});
-
-$("#add-new-prof").click(function(e){
-    e.preventDefault();
-    if (!validateForm('#prof-add-form', {
-        'new-prof-nomprenom': '#nomprenom-warning',
-        'new-prof-country_id': '#country_id-warning',
-        'new-prof-type_id': '#type_id-warning',
-        'genre': '#genre-warning',
-        'new-prof-phone': '#phone-warning',
-        'new-prof-email': '#email-warning',
-        'new-prof-wtsp': '#wtsp-warning',
-        'datenaissance': '#datenaissance-warning', // Ajout pour date de naissance
-        'new-prof-dateninscrip': '#dateninscrip-warning'
-    })) {
-        return;
-    }
-
-    let form = $('#prof-add-form')[0];
-    let data = new FormData(form);
-
-    $.ajax({
-        url: "{{ route('prof.store') }}",
-        type: "POST",
-        data: data,
-        dataType: "JSON",
-        processData: false,
-        contentType: false,
-        success: function(response) {
-            if (response.error) {
-                let errorMsg = '';
-                $.each(response.error, function(field, errors) {
-                    $.each(errors, function(index, error) {
-                        errorMsg += error + '<br>';
-                    });
-                });
-                iziToast.error({
-                    message: errorMsg,
-                    position: 'topRight'
-                });
-            } else {
-                iziToast.success({
-                    message: response.success,
-                    position: 'topRight'
-                });
-                $('#profAddModal').modal('hide');
-                addStudentToTable(response.prof);
+                return isValid;
             }
-        },
-        error: function(xhr, status, error) {
-            let errorMsg = '';
-            if (xhr.responseJSON && xhr.responseJSON.errors) {
-                $.each(xhr.responseJSON.errors, function(field, errors) {
-                    $.each(errors, function(index, error) {
-                        errorMsg += error + '<br>';
-                    });
-                });
-            } else {
-                errorMsg = 'Une erreur est survenue : ' + error;
-            }
-            iziToast.error({
-                message: errorMsg,
-                position: 'topRight'
+
+            $('#new-prof-phone').on('input', function () {
+                $('#new-prof-wtsp').val($(this).val());
             });
-        }
-    });
-});
+
+            $("#add-new-prof").click(function(e){
+                e.preventDefault();
+                if (!validateForm('#prof-add-form', {
+                    'new-prof-nomprenom': '#nomprenom-warning',
+                    'new-prof-country_id': '#country_id-warning',
+                    'new-prof-type_id': '#type_id-warning',
+                    'genre': '#genre-warning',
+                    'new-prof-phone': '#phone-warning',
+                    'new-prof-email': '#email-warning',
+                    'new-prof-wtsp': '#wtsp-warning',
+                    'datenaissance': '#datenaissance-warning', // Ajout pour date de naissance
+                    'new-prof-dateninscrip': '#dateninscrip-warning'
+                })) {
+                    return;
+                }
+
+                let form = $('#prof-add-form')[0];
+                let data = new FormData(form);
+
+                $.ajax({
+                    url: "{{ route('prof.store') }}",
+                    type: "POST",
+                    data: data,
+                    dataType: "JSON",
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.error) {
+                            let errorMsg = '';
+                            $.each(response.error, function(field, errors) {
+                                $.each(errors, function(index, error) {
+                                    errorMsg += error + '<br>';
+                                });
+                            });
+                            iziToast.error({
+                                message: errorMsg,
+                                position: 'topRight'
+                            });
+                        } else {
+                            iziToast.success({
+                                message: response.success,
+                                position: 'topRight'
+                            });
+                            $('#profAddModal').modal('hide');
+                            setTimeout(function () {
+                                location.reload();
+                            }, 1000);
+                            addStudentToTable(response.prof);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        let errorMsg = '';
+                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            $.each(xhr.responseJSON.errors, function(field, errors) {
+                                $.each(errors, function(index, error) {
+                                    errorMsg += error + '<br>';
+                                });
+                            });
+                        } else {
+                            errorMsg = 'Une erreur est survenue : ' + error;
+                        }
+                        iziToast.error({
+                            message: errorMsg,
+                            position: 'topRight'
+                        });
+                    }
+                });
+            });
 
             $('body').on('click', '#edit-prof', function () {
                 var tr = $(this).closest('tr');
@@ -839,6 +835,13 @@ function removeProfFromTable(id) {
                     alertElement.style.display = 'none';
                 }, 2000);
             }
+
+            function setDefaultDate() {
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('new-prof-dateninscrip').value = today;
+            }
+
+            window.onload = setDefaultDate;
         });
     </script>
 </body>

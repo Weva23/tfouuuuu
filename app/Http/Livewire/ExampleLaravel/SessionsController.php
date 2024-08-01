@@ -369,22 +369,23 @@ class SessionsController extends Component
 
     public function getStudentDetails($sessionId, $etudiantId)
     {
-        
         try {
             $etudiant = Etudiant::with(['paiements' => function ($query) use ($sessionId) {
                 $query->where('session_id', $sessionId);
             }])->findOrFail($etudiantId);
             $session = Sessions::findOrFail($sessionId);
-
+    
             $montantPaye = $etudiant->paiements->sum('montant_paye');
             $prixReel = $session->formation->prix;
             $resteAPayer = $prixReel - $montantPaye;
-
+            $noteTest = $etudiant->paiements->where('session_id', $sessionId)->first()->note_test ?? null;
+    
             return response()->json([
                 'success' => true,
                 'prix_formation' => $session->formation->prix,
                 'prix_reel' => $prixReel,
-                'reste_a_payer' => $resteAPayer
+                'reste_a_payer' => $resteAPayer,
+                'note_test' => $noteTest  // Ajouter la note_test dans la réponse
             ]);
         } catch (ModelNotFoundException $e) {
             return response()->json(['error' => 'Étudiant ou Formation non trouvé.'], 404);
@@ -457,38 +458,50 @@ class SessionsController extends Component
     public function addPaiement(Request $request, $sessionId)
     {
         Log::info('Received data:', $request->all());
-        // $request['mode_paiement']=1;
-        // $request['date_paiement']='2024-07-19';
+    
         $request->validate([
             'etudiant_id' => 'required|exists:etudiants,id',
-            'montant_paye' => 'required|numeric',
+            'montant_paye' => 'required|numeric|min:0.01',
             'mode_paiement' => 'required|exists:modes_paiement,id',
-            'date_paiement' => 'required|date', // Ensure this field is validated
+            'date_paiement' => 'required|date'
         ]);
-
+    
         try {
             $etudiant = Etudiant::findOrFail($request->etudiant_id);
             $session = Sessions::findOrFail($sessionId);
-
+    
+            // Calculer le reste à payer
+            $montantPayeTotal = $etudiant->paiements->where('session_id', $sessionId)->sum('montant_paye');
+            $prixReel = $session->formation->prix;
+            $resteAPayer = $prixReel - $montantPayeTotal;
+    
+            if ($request->montant_paye > $resteAPayer) {
+                return response()->json(['error' => 'Le montant payé ne peut pas être supérieur au reste à payer.'], 422);
+            }
+    
             // Vérifier si le lien existe déjà
             $exists = $session->etudiants()->where('etudiant_id', $request->etudiant_id)->exists();
-
+    
             if (!$exists) {
                 $session->etudiants()->attach($request->etudiant_id, [
                     'date_paiement' => $request->date_paiement,
                 ]);
             }
-
+    
+            // Récupérer la note de test existante si elle n'est pas fournie
+            $noteTest = $etudiant->paiements->where('session_id', $sessionId)->first()->note_test ?? null;
+    
             $paiement = new Paiement([
                 'etudiant_id' => $request->etudiant_id,
                 'session_id' => $sessionId,
-                'prix_reel' => $session->formation->prix,
+                'prix_reel' => $prixReel,
+                'note_test' => $noteTest,
                 'montant_paye' => $request->montant_paye,
                 'mode_paiement_id' => $request->mode_paiement,
-                'date_paiement' => $request->date_paiement, // Ensure this field is set
+                'date_paiement' => $request->date_paiement,
             ]);
             $paiement->save();
-
+    
             return response()->json(['success' => 'Paiement ajouté avec succès']);
         } catch (ModelNotFoundException $e) {
             Log::error('Model not found: ' . $e->getMessage());
@@ -818,9 +831,9 @@ class SessionsController extends Component
         return Excel::download(new SessionsExport(), 'sessions.xlsx');
     }
     public function exportStudents()
-{
-    return Excel::download(new StudentsExport(), 'students.xlsx');
-}
+    {
+        return Excel::download(new StudentsExport(), 'students.xlsx');
+    }
 public function profExport()
 {
     return Excel::download(new ProfessorsExport(), 'professe.xlsx');

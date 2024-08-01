@@ -14,6 +14,8 @@
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">EMAIL</th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Portable</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">WhatsApp</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Date d'inscription</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Date d'enregistrement</th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th>
                                         <th class="text-secondary opacity-7"></th>
                                     </tr>
@@ -25,22 +27,25 @@
                                         <!-- <td><img src="{{ asset('images/'.$etudiant->image)}}" alt="" width="60px"></td> -->
                                         <td>
                                             @if ($etudiant->image)
-                                                <img src="{{ asset('images/' . $etudiant->image) }}" alt="Image de l'étudiant" width="60px">
+                                                <img src="{{ asset('images/'.$etudiant->image)}}" alt="" width="60px">
                                             @else
                                                 N/A
                                             @endif
                                         </td>
-                                        <td>{{ $etudiant->nni ?? 'N/A' }}</td>
-                                        <td>{{ $etudiant->nomprenom ?? 'N/A' }}</td>
+                                        <td>{{ $etudiant->nni  }}</td>
+                                        <td>{{ $etudiant->nomprenom  }}</td>
                                         <td data-country-id="{{ $etudiant->country_id }}">{{ $etudiant->country->name ?? 'N/A' }}</td>
-                                        <td>{{ $etudiant->diplome ?? 'N/A' }}</td>
+                                        <td>{{ $etudiant->diplome  }}</td>
                                         <td>{{ $etudiant->genre ?? 'N/A' }}</td>
-                                        <td>{{ $etudiant->lieunaissance ?? 'N/A' }}</td>
-                                        <td>{{ $etudiant->adress ?? 'N/A' }}</td>
+                                        <td>{{ $etudiant->lieunaissance   }}</td>
+                                        <td>{{ $etudiant->adress   }}</td>
                                         <td>{{ $etudiant->datenaissance ?? 'N/A' }}</td>
-                                        <td>{{ $etudiant->email ?? 'N/A' }}</td>
+                                        <td>{{ $etudiant->email   }}</td>
                                         <td>{{ $etudiant->phone ?? 'N/A' }}</td>
-                                        <td>{{ $etudiant->wtsp ?? 'N/A' }}</td>
+                                        <td>{{ $etudiant->wtsp   }}</td>
+                                        <td>{{ $etudiant->dateninscrip ?? 'N/A' }}</td>
+                                        <td>{{ $etudiant->created_at ?? 'N/A' }}</td>
+
                                         <td>
                                             <a href="javascript:void(0)" id="edit-etudiant" data-id="{{ $etudiant->id }}" class="btn btn-info"><i class="material-icons opacity-10">border_color</i></a>
                                             <a href="javascript:void(0)" id="delete-etudiant" data-id="{{ $etudiant->id }}" class="btn btn-danger"><i class="material-icons opacity-10">delete</i></a>

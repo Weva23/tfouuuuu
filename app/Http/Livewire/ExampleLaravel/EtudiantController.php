@@ -12,18 +12,87 @@ use App\Models\ModePaiement;
 use Livewire\Component;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\EtudiantExport;
+use App\Exports\EtudEnCoursExport;
 use App\Models\Professeur;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\DB;
 
 class EtudiantController extends Component
 {
+    // public function liste_etudiant()
+    // {
+    //     // Fetch students with their sessions, ordered by the most recent first
+    //     $etudiants = Etudiant::with('sessions')->orderBy('created_at', 'desc')->paginate(4);
+    //     $countries = Country::all();
+    //     return view('livewire.example-laravel.etudiant-management', compact('etudiants', 'countries'));
+    // }
+
     public function liste_etudiant()
     {
-        $etudiants = Etudiant::with('sessions')->paginate(4);
+        // Assurez-vous que la colonne 'created_at' existe et est utilisée pour la date d'ajout
+        $etudiants = Etudiant::with('sessions')
+            ->orderBy('created_at', 'DESC')
+            ->paginate(4);
+    
         $countries = Country::all();
+    
         return view('livewire.example-laravel.etudiant-management', compact('etudiants', 'countries'));
     }
+
+
+
+
+    public function list_etudencours(Request $request)
+    {
+        // Récupérer les sessions en cours
+        $sessions = Sessions::whereDate('date_debut', '<=', now())
+            ->whereDate('date_fin', '>=', now())
+            ->get();
+
+        // Récupérer les étudiants et leurs paiements
+        $query = DB::table('etudiants')
+            ->join('etud_session', 'etudiants.id', '=', 'etud_session.etudiant_id')
+            ->join('sessions', 'sessions.id', '=', 'etud_session.session_id')
+            ->join('formations', 'formations.id', '=', 'sessions.formation_id')
+            ->leftJoin('paiements', 'paiements.etudiant_id', '=', 'etudiants.id')
+            ->select(
+                'etudiants.nomprenom',
+                'etudiants.phone',
+                'etudiants.wtsp',
+                'formations.nom as nom_formation',
+                'sessions.nom as nom_session',
+                'formations.prix as prix_formation',
+                'paiements.prix_reel',
+                DB::raw('SUM(paiements.montant_paye) as montant_paye'),
+                DB::raw('(paiements.prix_reel - SUM(paiements.montant_paye)) as reste_a_paye')
+            )
+            ->groupBy(
+                'etudiants.nomprenom',
+                'etudiants.phone',
+                'etudiants.wtsp',
+                'formations.nom',
+                'sessions.nom',
+                'formations.prix',
+                'paiements.prix_reel'
+            );
+
+        // Appliquer les filtres de recherche
+        if ($request->has('search')) {
+            $query->where('etudiants.nomprenom', 'LIKE', '%' . $request->search . '%');
+        }
+
+        $etudiants = $query->get();
+
+        return view('livewire.example-laravel.etudiant_encours', compact('etudiants', 'sessions'));
+    }
+
+
+
+
+
+
+
 
     // public function getEtudiantDetails($etudiantId)
     // {
@@ -59,6 +128,7 @@ class EtudiantController extends Component
             return [
                 'nom' => $session->nom,
                 'prix_reel' => $paiement ? $paiement->prix_reel : 0,
+                'note_test' => $paiement ? $paiement->note_test : 0,
                 'montant_paye' => $paiement ? $paiement->montant_paye : 0,
                 'reste_a_payer' => $paiement ? $paiement->prix_reel - $paiement->montant_paye : 0,
                 'statut' => $statut,
@@ -138,6 +208,7 @@ class EtudiantController extends Component
         'lieunaissance' => 'nullable|string',
         'adress' => 'nullable|string',
         'datenaissance' => 'nullable|date|before_or_equal:today', // Validation ajoutée pour la date
+        'dateninscrip' => 'required|date',
         'email' => 'nullable|email|unique:etudiants,email',
         'phone' => 'required|digits:8|integer|gt:0',
         'wtsp' => 'nullable|integer',
@@ -162,6 +233,7 @@ class EtudiantController extends Component
             'lieunaissance' => $request->lieunaissance,
             'adress' => $request->adress,
             'datenaissance' => $request->datenaissance,
+            'dateninscrip' => $request->dateninscrip,
             'email' => $request->email,
             'phone' => $request->phone,
             'wtsp' => $request->wtsp,

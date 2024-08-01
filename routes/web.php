@@ -219,7 +219,7 @@ Route::get('/searchProf', [SessionsController::class, 'searchProf'])->name('sear
 Route::get('/sessions/exportProf', [SessionsController::class, 'profExport'])->name('sessions.exportProf');
 
 
-Route::get('/sessions/exportStudents', [SessionsController::class, 'exportStudents'])->name('sessions.exportStudents');
+// Route::get('/sessions/exportStudents', [SessionsController::class, 'exportStudents'])->name('sessions.exportStudents');
 
 Route::get('/search_listetud', [SessionsController::class, 'search_listetud'])->name('search_listetud');
 Route::get('/contenues', [ContenusFormationController::class, 'liste_contenue'])->name('contenue.list');

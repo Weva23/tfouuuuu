@@ -134,11 +134,14 @@
                 <input type="hidden" id="prix-formation">
                 <input type="hidden" id="prix-reel">
                 <input type="hidden" id="note-test">
-                <input type="hidden" id="reste-a-payer">
+                <div class="form-group">
+                    <label for="reste-a-payer" class="form-label">Reste à Payer:</label>
+                    <input type="number" class="form-control" id="reste-a-payer" readonly>
+                </div>
                 <div class="form-group">
                     <label for="nouveau-montant-paye" class="form-label">Nouveau Montant Payé:</label>
                     <input type="number" class="form-control" id="nouveau-montant-paye" placeholder="Entrez le montant payé">
-                    <div class="text-danger" id="montant-paye-warning" style="margin-top: 5px;"></div>
+                    <div class="text-danger" id="nouveau-montant-paye-warning" style="margin-top: 5px;"></div>
                 </div>
                 <div class="form-group">
                     <label for="nouveau-mode-paiement" class="form-label">Mode de Paiement:</label>
@@ -251,12 +254,15 @@
                 <input type="hidden" id="prof-session-id">
                 <input type="hidden" id="prof-montant">
                 <input type="hidden" id="prof-montant_a_paye">
-                <input type="hidden" id="prof-reste-a-payer">
                 <input type="hidden" id="prof-typeymntprofs">
+                <div class="mb-3">
+                    <label for="prof-reste-a-payer" class="form-label">Reste à Payer</label>
+                    <input type="number" class="form-control" id="prof-reste-a-payer" readonly>
+                </div>
                 <div class="mb-3">
                     <label for="prof-nouveau-montant-paye" class="form-label">Montant Payé</label>
                     <input type="number" class="form-control" id="prof-nouveau-montant-paye" placeholder="Entrez le montant payé" required>
-                    <div class="text-danger" id="montant-paye-warning" style="margin-top: 5px;"></div>
+                    <div class="text-danger" id="nouveau-prof-montant-paye-warning" style="margin-top: 5px;"></div>
                 </div>
                 <div class="mb-3">
                     <label for="nouveau-prof-mode-paiement" class="form-label">Mode de Paiement</label>
@@ -740,10 +746,9 @@ $(document).ready(function () {
                         $('#etudiant-session-id').val(sessionId);
                         $('#prix-formation').val(response.prix_formation);
                         $('#prix-reel').val(response.prix_reel);
-                        $('#note-test').val(response.note_test);
+                        $('#note-test').val(response.note_test);  // Récupération de note_test
 
                         $('#reste-a-payer').val(resteAPayer);
-                         // Set the date field to today's date
                         const today = new Date().toISOString().split('T')[0];
                         $('#nouveau-date-paiement').val(today);
                         $('#paiementAddModal').modal('show');
@@ -768,10 +773,10 @@ $(document).ready(function () {
         const etudiantId = $('#etudiant-id').val();
         const sessionId = $('#new-student-session_id').val();
         const datePaiement = $('#date-paiement').val();
-        const montantPaye = $('#montant-paye').val();
+        const montantPaye = parseFloat($('#montant-paye').val());
         const modePaiement = $('#mode-paiement').val();
-        const noteTest = $('#note-test').val();
-        const prixReel = $('#prix-reel').val();
+        const prixReel = parseFloat($('#prix-reel').val());
+        const noteTest = parseFloat($('#note-test').val());
 
         // Validation des champs requis
         let isValid = true;
@@ -797,7 +802,11 @@ $(document).ready(function () {
         if ($('#montant-paye').val().trim() === '') {
             isValid = false;
             $('#montant-paye').addClass('is-invalid');
-            $('#montant-paye-warning').text('champ est requis.');
+            $('#montant-paye-warning').text('Ce champ est requis.');
+        } else if (montantPaye > prixReel) {
+            isValid = false;
+            $('#montant-paye').addClass('is-invalid');
+            $('#montant-paye-warning').text('Ce champ ne doit pas être supérieur au prix réel.');
         } else {
             $('#montant-paye').removeClass('is-invalid');
             $('#montant-paye-warning').text('');
@@ -821,6 +830,19 @@ $(document).ready(function () {
             $('#date-paiement-warning').text('');
         }
 
+        if ($('#note-test').val().trim() === '') {
+            isValid = false;
+            $('#note-test').addClass('is-invalid');
+            $('#note-test-warning').text('Ce champ est requis.');
+        } else if (noteTest > 20) {
+            isValid = false;
+            $('#note-test').addClass('is-invalid');
+            $('#note-test-warning').text('Ce champ ne doit pas être supérieure à 20.');
+        } else {
+            $('#note-test').removeClass('is-invalid');
+            $('#note-test-warning').text('');
+        }
+
         if (!isValid) {
             return;
         }
@@ -836,7 +858,6 @@ $(document).ready(function () {
                 mode_paiement: modePaiement,
                 prix_reel: prixReel,
                 note_test: noteTest
-
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -859,41 +880,31 @@ $(document).ready(function () {
         });
     }
 
-    // Function to reset the student form
-    function resetEtudiantForm() {
-        $('#etudiant-id').val('');
-        $('#new-student-session_id').val('');
-        $('#student-phone-search').val('');
-        $('#student-search-results').html('');
-        $('#formation-price').val('');
-        $('#prix-reel').val('');
-        $('#montant-paye').val('');
-        $('#mode-paiement').val('');
-        $('#date-paiement').val('');
-        $('#phone-warning').text('');
-        $('#prix-reel-warning').text('');
-        $('#montant-paye-warning').text('');
-        $('#mode-paiement-warning').text('');
-        $('#date-paiement-warning').text('');
-    }
+
 
     window.addPaiement = function() {
         const etudiantId = $('#etudiant-id').val();
         const sessionId = $('#etudiant-session-id').val();
-        const nouveauMontantPaye = $('#nouveau-montant-paye').val();
+        const nouveauMontantPaye = parseFloat($('#nouveau-montant-paye').val());
         const modePaiement = $('#nouveau-mode-paiement').val();
         const datePaiement = $('#nouveau-date-paiement').val();
+        const resteAPayer = parseFloat($('#reste-a-payer').val());
+        const noteTest = $('#note-test').val();  // Ajout de note_test
 
         // Validation des champs requis
         let isValid = true;
 
-        if (nouveauMontantPaye.trim() === '') {
+        if (nouveauMontantPaye === '' || isNaN(nouveauMontantPaye)) {
             isValid = false;
             $('#nouveau-montant-paye').addClass('is-invalid');
-            $('#montant-paye-warning').text('Ce champ est requis.');
+            $('#nouveau-montant-paye-warning').text('Ce champ est requis.');
+        } else if (nouveauMontantPaye > resteAPayer) {
+            isValid = false;
+            $('#nouveau-montant-paye').addClass('is-invalid');
+            $('#nouveau-montant-paye-warning').text(`Le montant payé ne peut pas dépasser le reste à payer (${resteAPayer}).`);
         } else {
             $('#nouveau-montant-paye').removeClass('is-invalid');
-            $('#montant-paye-warning').text('');
+            $('#nouveau-montant-paye-warning').text('');
         }
 
         if (modePaiement === '') {
@@ -926,7 +937,8 @@ $(document).ready(function () {
                 etudiant_id: etudiantId,
                 montant_paye: nouveauMontantPaye,
                 mode_paiement: modePaiement,
-                date_paiement: datePaiement
+                date_paiement: datePaiement,
+                note_test: noteTest  // Pass the retrieved note_test value
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -948,6 +960,27 @@ $(document).ready(function () {
             }
         });
     }
+
+
+    // Function to reset the student form
+    function resetEtudiantForm() {
+        $('#etudiant-id').val('');
+        $('#new-student-session_id').val('');
+        $('#student-phone-search').val('');
+        $('#student-search-results').html('');
+        $('#formation-price').val('');
+        $('#prix-reel').val('');
+        $('#montant-paye').val('');
+        $('#mode-paiement').val('');
+        $('#date-paiement').val('');
+        $('#phone-warning').text('');
+        $('#prix-reel-warning').text('');
+        $('#montant-paye-warning').text('');
+        $('#mode-paiement-warning').text('');
+        $('#date-paiement-warning').text('');
+    }
+
+
 
     // Function to reset the payment form
     function resetPaiementForm() {
@@ -1000,27 +1033,24 @@ $(document).ready(function () {
                     return;
                 }
                 $(document).ready(function () {
-    $('#search_bar').on('keyup', function() {
-        var query = $(this).val();
-        console.log('Search query: ', query);  // Log de la requête de recherche
+                    $('#search_bar').on('keyup', function() {
+                        var query = $(this).val();
+                        console.log('Search query: ', query);  // Log de la requête de recherche
 
-        $.ajax({
-            url: "{{ route('search_listetud') }}",
-            type: "GET",
-            data: {'search': query},
-            success: function(data) {
-                console.log('Search results: ', data);  // Log des résultats de la recherche
-                $('#sessions-table-etud').html(data.html);
-            },
-            error: function(xhr, status, error) {
-                console.error('AJAX error: ', error);  // Log des erreurs AJAX
-            }
-        });
-    });
-});
-
-
-
+                        $.ajax({
+                            url: "{{ route('search_listetud') }}",
+                            type: "GET",
+                            data: {'search': query},
+                            success: function(data) {
+                                console.log('Search results: ', data);  // Log des résultats de la recherche
+                                $('#sessions-table-etud').html(data.html);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('AJAX error: ', error);  // Log des erreurs AJAX
+                            }
+                        });
+                    });
+                });
 
                 let html = `<div class="container-fluid ">
                     <div class="row">
@@ -1034,10 +1064,10 @@ $(document).ready(function () {
                                         <button class="btn btn-secondary" onclick="hideStudentContents()">Fermer</button>
                                     </div>
                               <form class="d-flex align-items-center ms-auto">
-    <div class="input-group input-group-sm" style="width: 250px;">
-        <input type="text" name="search" id="search_bar" class="form-control" placeholder="Rechercher..." value="{{ isset($search) ? $search : '' }}">
-    </div>
-</form>
+                                <div class="input-group input-group-sm" style="width: 250px;">
+                                    <input type="text" name="search" id="search_bar" class="form-control" placeholder="Rechercher..." value="{{ isset($search) ? $search : '' }}">
+                                </div>
+                            </form>
 
 
 
@@ -1064,6 +1094,9 @@ $(document).ready(function () {
                     response.etudiants.forEach(function(content) {
                         let resteAPayer = content.prix_reel - content.montant_paye;
 
+                        let buttonClass = resteAPayer <= 0 ? 'btn btn-info' : 'btn btn-dark';
+
+
                         html += `<tr>
                             <td>${content.nomprenom}</td>
                             <td>${content.phone}</td>
@@ -1075,7 +1108,7 @@ $(document).ready(function () {
                             <td>${resteAPayer}</td>
 
                             <td>
-                                 <button class="btn btn-dark" onclick="openAddPaymentModal(${content.id}, ${sessionId})" data-toggle="tooltip" title="Ajouter un paiement">
+                                 <button class="${buttonClass}" onclick="openAddPaymentModal(${content.id}, ${sessionId})" data-toggle="tooltip" title="Ajouter un paiement">
                                     <i class="material-icons opacity-10">payment</i>
                                 </button>
                                 <button class="btn btn-danger" onclick="deleteStudentFromSession(${content.id}, ${sessionId})" data-toggle="tooltip" title="Retirer">
@@ -1322,139 +1355,180 @@ $(document).ready(function () {
 
 
     window.addProfAndPaiement = function() {
-        const profId = $('#prof-id').val();
-        const sessionId = $('#new-prof-session_id').val();
-        const datePaiement = $('#prof-date-paiement').val();
-        const montantAPaye = $('#prof-montant_a_paye').val();
-        const montantPaye = $('#prof-montant_paye').val();
-        const modePaiement = $('#prof-mode-paiement').val();
-        const montant = $('#prof-montant').val();
-        const typeId = $('#prof-typeymntprofs').val();
+    const profId = $('#prof-id').val();
+    const sessionId = $('#new-prof-session_id').val();
+    const datePaiement = $('#prof-date-paiement').val();
+    const montantAPaye = parseFloat($('#prof-montant_a_paye').val());
+    const montantPaye = parseFloat($('#prof-montant_paye').val());
+    const modePaiement = $('#prof-mode-paiement').val();
+    const montant = $('#prof-montant').val();
+    const typeId = $('#prof-typeymntprofs').val();
+
+    // Validation des champs requis
+    let isValid = true;
+
+    if ($('#prof-phone-search').val().trim() === '') {
+        isValid = false;
+        $('#prof-phone-search').addClass('is-invalid');
+        $('#prof-phone-warning').text('Ce champ est requis.');
+    } else {
+        $('#prof-phone-search').removeClass('is-invalid');
+        $('#prof-phone-warning').text('');
+    }
+
+    if ($('#prof-typeymntprofs').val() === '') {
+        isValid = false;
+        $('#prof-typeymntprofs').addClass('is-invalid');
+        $('#prof-type-warning').text('Ce champ est requis.');
+    } else {
+        $('#prof-typeymntprofs').removeClass('is-invalid');
+        $('#prof-type-warning').text('');
+    }
+
+    if ($('#prof-montant').val().trim() === '') {
+        isValid = false;
+        $('#prof-montant').addClass('is-invalid');
+        $('#prof-montant-warning').text('Ce champ est requis.');
+    } else {
+        $('#prof-montant').removeClass('is-invalid');
+        $('#prof-montant-warning').text('');
+    }
+
+    if ($('#prof-montant_a_paye').val().trim() === '') {
+        isValid = false;
+        $('#prof-montant_a_paye').addClass('is-invalid');
+        $('#prof-montant-a-paye-warning').text('Ce champ est requis.');
+    } else {
+        $('#prof-montant_a_paye').removeClass('is-invalid');
+        $('#prof-montant-a-paye-warning').text('');
+    }
+
+    if ($('#prof-montant_paye').val().trim() === '') {
+        isValid = false;
+        $('#prof-montant_paye').addClass('is-invalid');
+        $('#prof-montant-paye-warning').text('Ce champ est requis.');
+    } else if (montantPaye > montantAPaye) {
+        isValid = false;
+        $('#prof-montant_paye').addClass('is-invalid');
+        $('#prof-montant-paye-warning').text('Ce champ ne doit pas être supérieur au montant à payer.');
+    } else {
+        $('#prof-montant_paye').removeClass('is-invalid');
+        $('#prof-montant-paye-warning').text('');
+    }
+
+    if ($('#prof-mode-paiement').val() === '') {
+        isValid = false;
+        $('#prof-mode-paiement').addClass('is-invalid');
+        $('#prof-mode-warning').text('Ce champ est requis.');
+    } else {
+        $('#prof-mode-paiement').removeClass('is-invalid');
+        $('#prof-mode-warning').text('');
+    }
+
+    if ($('#prof-date-paiement').val().trim() === '') {
+        isValid = false;
+        $('#prof-date-paiement').addClass('is-invalid');
+        $('#prof-date-warning').text('Ce champ est requis.');
+    } else {
+        $('#prof-date-paiement').removeClass('is-invalid');
+        $('#prof-date-warning').text('');
+    }
+
+    if (!profId || !sessionId) {
+        isValid = false;
+        alert('Professeur ID ou Session ID est manquant.');
+    }
+
+    if (!isValid) {
+        return;
+    }
+
+    // AJAX request to add the professor and payment
+    $.ajax({
+        url: `/sessions/${sessionId}/profs/${profId}/add`,
+        type: 'POST',
+        data: {
+            prof_id: profId,
+            date_paiement: datePaiement,
+            montant_a_paye: montantAPaye,
+            montant_paye: montantPaye,
+            mode_paiement: modePaiement,
+            montant: montant,
+            typeymntprofs_id: typeId,
+        },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(response) {
+            if (response.success) {
+                $('#profAddModal').modal('hide');
+                resetProfForm();
+                showProfContents(sessionId); // Refresh the list after adding
+            } else {
+                alert(response.error);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error:', error);
+            console.error('Status:', status);
+            console.error('Response:', xhr.responseText);
+            alert('Erreur lors de l\'ajout du professeur: ' + xhr.responseText);
+        }
+    });
+}
+
+
+
+    window.addProfPaiement = function() {
+        let profId = $('#prof-id').val();
+        let sessionId = $('#prof-session-id').val();
+        let nouveauMontantPaye = parseFloat($('#prof-nouveau-montant-paye').val());
+        let modePaiement = $('#nouveau-prof-mode-paiement').val();
+        let datePaiement = $('#nouveau-prof-date-paiement').val();
+        let resteAPayer = parseFloat($('#prof-reste-a-payer').val());
+        let montant = $('#prof-montant').val();
+        let montantAPaye = $('#prof-montant_a_paye').val();
+        let typeymntprofsId = $('#prof-typeymntprofs').val();
 
         // Validation des champs requis
         let isValid = true;
 
-        if ($('#prof-phone-search').val().trim() === '') {
+        if (!nouveauMontantPaye || isNaN(nouveauMontantPaye)) {
             isValid = false;
-            $('#prof-phone-search').addClass('is-invalid');
-            $('#prof-phone-warning').text('Ce champ est requis.');
+            $('#prof-nouveau-montant-paye').addClass('is-invalid');
+            $('#nouveau-prof-montant-paye-warning').text('Ce champ est requis.');
+        } else if (nouveauMontantPaye > resteAPayer) {
+            isValid = false;
+            $('#prof-nouveau-montant-paye').addClass('is-invalid');
+            $('#nouveau-prof-montant-paye-warning').text(`Le montant payé ne peut pas dépasser le reste à payer (${resteAPayer}).`);
         } else {
-            $('#prof-phone-search').removeClass('is-invalid');
-            $('#prof-phone-warning').text('');
+            $('#prof-nouveau-montant-paye').removeClass('is-invalid');
+            $('#nouveau-prof-montant-paye-warning').text('');
         }
 
-        if ($('#prof-typeymntprofs').val() === '') {
+        if (!modePaiement) {
             isValid = false;
-            $('#prof-typeymntprofs').addClass('is-invalid');
-            $('#prof-type-warning').text('Ce champ est requis.');
+            $('#nouveau-prof-mode-paiement').addClass('is-invalid');
+            $('#mode-paiement-warning').text('Ce champ est requis.');
         } else {
-            $('#prof-typeymntprofs').removeClass('is-invalid');
-            $('#prof-type-warning').text('');
+            $('#nouveau-prof-mode-paiement').removeClass('is-invalid');
+            $('#mode-paiement-warning').text('');
         }
 
-        if ($('#prof-montant').val().trim() === '') {
+        if (!datePaiement) {
             isValid = false;
-            $('#prof-montant').addClass('is-invalid');
-            $('#prof-montant-warning').text('Ce champ est requis.');
+            $('#nouveau-prof-date-paiement').addClass('is-invalid');
+            $('#date-paiement-warning').text('Ce champ est requis.');
         } else {
-            $('#prof-montant').removeClass('is-invalid');
-            $('#prof-montant-warning').text('');
-        }
-
-        if ($('#prof-montant_a_paye').val().trim() === '') {
-            isValid = false;
-            $('#prof-montant_a_paye').addClass('is-invalid');
-            $('#prof-montant-a-paye-warning').text('Ce champ est requis.');
-        } else {
-            $('#prof-montant_a_paye').removeClass('is-invalid');
-            $('#prof-montant-a-paye-warning').text('');
-        }
-
-        if ($('#prof-montant_paye').val().trim() === '') {
-            isValid = false;
-            $('#prof-montant_paye').addClass('is-invalid');
-            $('#prof-montant-paye-warning').text('Ce champ est requis.');
-        } else {
-            $('#prof-montant_paye').removeClass('is-invalid');
-            $('#prof-montant-paye-warning').text('');
-        }
-
-        if ($('#prof-mode-paiement').val() === '') {
-            isValid = false;
-            $('#prof-mode-paiement').addClass('is-invalid');
-            $('#prof-mode-warning').text('Ce champ est requis.');
-        } else {
-            $('#prof-mode-paiement').removeClass('is-invalid');
-            $('#prof-mode-warning').text('');
-        }
-
-        if ($('#prof-date-paiement').val().trim() === '') {
-            isValid = false;
-            $('#prof-date-paiement').addClass('is-invalid');
-            $('#prof-date-warning').text('Ce champ est requis.');
-        } else {
-            $('#prof-date-paiement').removeClass('is-invalid');
-            $('#prof-date-warning').text('');
-        }
-
-        if (!profId || !sessionId) {
-            isValid = false;
-            alert('Professeur ID ou Session ID est manquant.');
+            $('#nouveau-prof-date-paiement').removeClass('is-invalid');
+            $('#date-paiement-warning').text('');
         }
 
         if (!isValid) {
             return;
         }
 
-        // AJAX request to add the professor and payment
-        $.ajax({
-            url: `/sessions/${sessionId}/profs/${profId}/add`,
-            type: 'POST',
-            data: {
-                prof_id: profId,
-                date_paiement: datePaiement,
-                montant_a_paye: montantAPaye,
-                montant_paye: montantPaye,
-                mode_paiement: modePaiement,
-                montant: montant,
-                typeymntprofs_id: typeId,
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(response) {
-                if (response.success) {
-                    $('#profAddModal').modal('hide');
-                    resetProfForm();
-                    showProfContents(sessionId); // Refresh the list after adding
-                } else {
-                    alert(response.error);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error:', error);
-                console.error('Status:', status);
-                console.error('Response:', xhr.responseText);
-                alert('Erreur lors de l\'ajout du professeur: ' + xhr.responseText);
-            }
-        });
-    }
-
-    window.addProfPaiement = function() {
-        let profId = $('#prof-id').val();
-        let sessionId = $('#prof-session-id').val();
-        let nouveauMontantPaye = $('#prof-nouveau-montant-paye').val();
-        let modePaiement = $('#nouveau-prof-mode-paiement').val();
-        let datePaiement = $('#nouveau-prof-date-paiement').val();
-        let montant = $('#prof-montant').val();
-        let montantAPaye = $('#prof-montant_a_paye').val();
-        let typeymntprofsId = $('#prof-typeymntprofs').val();
-
-        if (!datePaiement) {
-            alert('Veuillez sélectionner une date de paiement.');
-            return;
-        }
-
+        // AJAX request to add the payment
         $.ajax({
             url: `/sessions/${sessionId}/profpaiements`,
             type: 'POST',
@@ -1466,6 +1540,9 @@ $(document).ready(function () {
                 typeymntprofs_id: typeymntprofsId,
                 montant: montant,
                 montant_a_paye: montantAPaye
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
                 if (response.success) {
@@ -1581,11 +1658,10 @@ $(document).ready(function () {
                                         <button class="btn btn-secondary" onclick="hideProfContents()">Fermer</button>
                                     </div>
                                     <form class="d-flex align-items-center ms-auto">
-    <div class="input-group input-group-sm" style="width: 250px;">
-        <input type="text" name="search_prof" id="search_prof_bar" class="form-control" placeholder="Rechercher professeur...">
-    </div>
-</form>
-</form>
+                                        <div class="input-group input-group-sm" style="width: 250px;">
+                                            <input type="text" name="search_prof" id="search_prof_bar" class="form-control" placeholder="Rechercher professeur...">
+                                        </div>
+                                    </form>
                                 </div>
                                 
                                 <div class="card-body px-0 pb-2">
@@ -1612,6 +1688,9 @@ $(document).ready(function () {
                         let montant_paye = content.montant_paye || 0;
                         let resteAPayer = montant_a_paye - montant_paye;
 
+                        let buttonClass = resteAPayer <= 0 ? 'btn btn-info' : 'btn btn-dark';
+
+
                         html += `<tr>
                             <td>${content.nomprenom || 'N/A'}</td>
                             <td>${content.phone || 'N/A'}</td>
@@ -1621,7 +1700,7 @@ $(document).ready(function () {
                             <td>${montant_paye}</td>
                             <td>${resteAPayer}</td>
                            <td>
-                                <button class="btn btn-dark" onclick="openAddProfPaymentModal(${content.id}, ${sessionId})" data-toggle="tooltip" title="Ajouter un paiement">
+                                <button class="${buttonClass}" onclick="openAddProfPaymentModal(${content.id}, ${sessionId})" data-toggle="tooltip" title="Ajouter un paiement">
                                     <i class="material-icons opacity-10">payment</i>
                                 </button>
                                 <button class="btn btn-danger" onclick="deleteProfFromSession(${content.id}, ${sessionId})" data-toggle="tooltip" title="Retirer">

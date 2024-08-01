@@ -23,34 +23,32 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <style>
-        .imgUpload {
-            max-width: 90px;
-            max-height: 70px;
-            min-width: 50px;
-            min-height: 50px;
-        }
-        .required::after {
-            content: " *";
-            color: red;
-        }
-        .form-control {
-            border: 1px solid #ccc;
-            border-radius: 6px;
-        }
-        .form-control:focus {
-            border-color: #66afe9;
-            outline: 0;
-            box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
-            border-radius: solid 2px;
-        }
-        .modal-content {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .modal-body .form-label {
-            font-weight: bold;
-        }
-    </style>
+    .imgUpload {
+        max-width: 90px;
+        max-height: 70px;
+        min-width: 50px;
+        min-height: 50px;
+    }
+    .required::after {
+        content: " *";
+        color: red;
+    }
+    .modal-content {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+    .form-control {
+        border: 1px solid #ccc;
+    }
+    .form-control:focus {
+        border-color: #66afe9;
+        outline: 0;
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+    }
+</style>
+
+
+    
     
 </head>
 <body>
@@ -89,12 +87,12 @@
 
 
 <!-- Add Student Modal -->
-<!-- Add Student Modal -->
 <div class="modal fade" id="etudiantAddModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content" style="width: 40cm;">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Ajouter un nouvel étudiant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="etudiant-add-form" enctype="multipart/form-data">
@@ -119,9 +117,8 @@
                             <input type="text" class="form-control" id="new-etudiant-lieunaissance" placeholder="Lieu de naissance" name="lieunaissance">
                         </div>
                     </div>
-                    <!-- <div class="row mb-5"> -->
                     <div class="row mb-4">
-                        <div class="form-group col-md-6 col-lg-3">
+                        <div class="col-md-6 col-lg-3">
                             <label for="country_id" class="form-label required">Nationalité</label>
                             <select class="form-control" id="new-etudiant-country_id" name="country_id">
                                 <option value="">Choisir la nationalité</option>
@@ -145,11 +142,11 @@
                             </div>
                             <div class="text-danger" id="genre-warning"></div>
                         </div>
-                        <div class="col-md-3">
-    <label for="datenaissance" class="form-label">Date de naissance:</label>
-    <input type="date" class="form-control" id="new-etudiant-datenaissance" placeholder="Date de naissance" name="datenaissance">
-    <div class="text-danger" id="datenaissance-warning"></div> <!-- Zone pour le message d'erreur -->
-</div>
+                        <div class="col-md-6 col-lg-3">
+                            <label for="datenaissance" class="form-label">Date de naissance:</label>
+                            <input type="date" class="form-control" id="new-etudiant-datenaissance" name="datenaissance">
+                            <div class="text-danger" id="datenaissance-warning"></div>
+                        </div>
                     </div>
                     <div class="row mb-4">
                         <div class="col-md-6 col-lg-3">
@@ -162,11 +159,10 @@
                             <input type="number" class="form-control" id="new-etudiant-phone" placeholder="Portable" name="phone">
                             <div class="text-danger" id="phone-warning"></div>
                         </div>
-                        <div class="col-md-3 col-lg-2">
+                        <div class="col-md-6 col-lg-2">
                             <label for="wtsp" class="form-label">WhatsApp:</label>
                             <input type="number" class="form-control" id="new-etudiant-wtsp" placeholder="WhatsApp" name="wtsp">
                             <div class="text-danger" id="wtsp-warning"></div>
-
                         </div>
                         <div class="col-md-6 col-lg-2">
                             <label for="adress" class="form-label">Adresse:</label>
@@ -174,7 +170,7 @@
                         </div>
                         <div class="col-md-6 col-lg-3">
                             <label for="dateninscrip" class="form-label">Date d'inscription:</label>
-                            <input type="date" class="form-control" id="new-etudiant-dateninscrip" placeholder="Date d'inscription'e" name="dateninscrip">
+                            <input type="date" class="form-control" id="new-etudiant-dateninscrip" name="dateninscrip">
                             <div class="text-danger" id="dateninscrip-warning"></div>
                         </div>
                     </div>
@@ -190,88 +186,86 @@
 
 <!-- Edit Student Modal -->
 <div class="modal fade" id="etudiantEditModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content" style="width: 40cm;">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Modifier Etudiant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="etudiant-edit-form" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" id="etudiant-id" name="id">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="row mb-4">
-                            <div class="col-md-3">
-                                <label for="image" class="form-label">Image:</label>
-                                <img src="" id="imagePreview" class="imgUpload" alt="">
-                                <div>
-                                    <input type="file" class="form-control" id="image" name="image">
-                                </div>
+                    <div class="row mb-4">
+                        <div class="col-md-6 col-lg-3">
+                            <label for="image" class="form-label">Image:</label>
+                            <img src="" id="imagePreview" class="imgUpload" alt="">
+                            <div>
+                                <input type="file" class="form-control" id="image" name="image">
                             </div>
-                            <div class="col-md-3">
-                                <label for="nni" class="form-label required">NNI:</label>
-                                <input type="text" class="form-control" id="etudiant-nni" placeholder="NNI" name="nni">
-                                <div class="text-danger" id="edit-nni-warning"></div>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="nomprenom" class="form-label required">Nom & Prénom:</label>
-                                <input type="text" class="form-control" id="etudiant-nomprenom" placeholder="Nom & Prénom" name="nomprenom">
-                                <div class="text-danger" id="edit-nomprenom-warning"></div>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="lieunaissance" class="form-label">Lieu de naissance:</label>
-                                <input type="text" class="form-control" id="etudiant-lieunaissance" placeholder="Lieu de naissance" name="lieunaissance">
-                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <label for="nni" class="form-label required">NNI:</label>
+                            <input type="text" class="form-control" id="etudiant-nni" placeholder="NNI" name="nni">
+                            <div class="text-danger" id="edit-nni-warning"></div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <label for="nomprenom" class="form-label required">Nom & Prénom:</label>
+                            <input type="text" class="form-control" id="etudiant-nomprenom" placeholder="Nom & Prénom" name="nomprenom">
+                            <div class="text-danger" id="edit-nomprenom-warning"></div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <label for="lieunaissance" class="form-label">Lieu de naissance:</label>
+                            <input type="text" class="form-control" id="etudiant-lieunaissance" placeholder="Lieu de naissance" name="lieunaissance">
                         </div>
                     </div>
                     <div class="row mb-4">
-                        <div class="form-group col-md-3">
+                        <div class="col-md-6 col-lg-3">
                             <label for="country_id" class="form-label required">Nationalité</label>
                             <select class="form-control" id="etudiant-country_id" name="country_id">
-                                <option value="">Select Country</option>
+                                <option value="">Choisir la nationalité</option>
                                 @foreach ($countries as $country)
                                     <option value="{{ $country->id }}">{{ $country->name }}</option>
                                 @endforeach
                             </select>
                             <div class="text-danger" id="edit-country_id-warning"></div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-6 col-lg-3">
                             <label for="diplome" class="form-label">Diplôme:</label>
                             <input type="text" class="form-control" id="etudiant-diplome" placeholder="Diplôme" name="diplome">
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-6 col-lg-3">
                             <label class="form-label required">Genre:</label>
                             <div>
-                                <input type="radio" id="male" name="genre" value="Male">
-                                <label for="male">Male</label>
-                                <input type="radio" id="female" name="genre" value="Female">
-                                <label for="female">Female</label>
+                                <input type="radio" id="edit-male" name="genre" value="Male">
+                                <label for="edit-male">Male</label>
+                                <input type="radio" id="edit-female" name="genre" value="Female">
+                                <label for="edit-female">Female</label>
                             </div>
                             <div class="text-danger" id="edit-genre-warning"></div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-6 col-lg-3">
                             <label for="datenaissance" class="form-label">Date de naissance:</label>
                             <input type="date" class="form-control" id="etudiant-datenaissance" name="datenaissance">
                         </div>
                     </div>
                     <div class="row mb-4">
-                        <div class="col-md-3">
+                        <div class="col-md-6 col-lg-3">
                             <label for="email" class="form-label">Email:</label>
                             <input type="email" class="form-control" id="etudiant-email" placeholder="email@example.com" name="email">
                             <div class="text-danger" id="edit-email-warning"></div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-6 col-lg-3">
                             <label for="phone" class="form-label required">Portable:</label>
-                            <input type="text" class="form-control" id="etudiant-phone" placeholder="Portable" name="phone">
+                            <input type="number" class="form-control" id="etudiant-phone" placeholder="Portable" name="phone">
                             <div class="text-danger" id="edit-phone-warning"></div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-6 col-lg-3">
                             <label for="wtsp" class="form-label">WhatsApp:</label>
-                            <input type="text" class="form-control" id="etudiant-wtsp" placeholder="WhatsApp" name="wtsp">
+                            <input type="number" class="form-control" id="etudiant-wtsp" placeholder="WhatsApp" name="wtsp">
                             <div class="text-danger" id="edit-wtsp-warning"></div>
-
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-6 col-lg-3">
                             <label for="adress" class="form-label">Adresse:</label>
                             <input type="text" class="form-control" id="etudiant-adress" placeholder="Adresse" name="adress">
                         </div>
@@ -285,6 +279,7 @@
         </div>
     </div>
 </div>
+
 
 
 
@@ -312,86 +307,86 @@ $(document).ready(function () {
                 });
             });
 
-$(document).ready(function() {
-    $('body').on('click', '.detail-etudiant', function() { // Change to class selector
-        var etudiantId = $(this).data('id');
-        fetchEtudiantDetails(etudiantId);
+    $(document).ready(function() {
+        $('body').on('click', '.detail-etudiant', function() { // Change to class selector
+            var etudiantId = $(this).data('id');
+            fetchEtudiantDetails(etudiantId);
+        });
     });
-});
 
 
-function fetchEtudiantDetails(etudiantId) {
-    $.ajax({
-        url: `/etudiants/${etudiantId}/details`,
-        type: 'GET',
-        success: function(response) {
-            if (response.error) {
-                iziToast.error({ message: response.error, position: 'topRight' });
-                return;
-            }
+    function fetchEtudiantDetails(etudiantId) {
+        $.ajax({
+            url: `/etudiants/${etudiantId}/details`,
+            type: 'GET',
+            success: function(response) {
+                if (response.error) {
+                    iziToast.error({ message: response.error, position: 'topRight' });
+                    return;
+                }
 
-            let formationsHtml = '';
-            if (response.formations.length > 0) {
-                formationsHtml = `
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Formation</th>
-                                <th>Montant à Payer</th>
-                                <th>Montant Payé</th>
-                                <th>Reste à Payer</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${response.formations.map(formation => `
+                let formationsHtml = '';
+                if (response.formations.length > 0) {
+                    formationsHtml = `
+                        <table class="table table-bordered">
+                            <thead>
                                 <tr>
-                                    <td>${formation.nom} <span style="font-style: italic; color: ${formation.statut === 'En cours' ? 'green' : 'red'};">(${formation.statut})</span></td>
-                                    <td>${formation.prix_reel}</td>
-                                    <td>${formation.montant_paye}</td>
-                                    <td>${formation.reste_a_payer}</td>
+                                    <th>Formation</th>
+                                    <th>Montant à Payer</th>
+                                    <th>Montant Payé</th>
+                                    <th>Reste à Payer</th>
                                 </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
-            } else {
-                formationsHtml = '<div class="row"><div class="col-md-12"><center>Aucune formation inscrite.</center></div></div>';
-            }
+                            </thead>
+                            <tbody>
+                                ${response.formations.map(formation => `
+                                    <tr>
+                                        <td>${formation.nom} <span style="font-style: italic; color: ${formation.statut === 'En cours' ? 'green' : 'red'};">(${formation.statut})</span></td>
+                                        <td>${formation.prix_reel}</td>
+                                        <td>${formation.montant_paye}</td>
+                                        <td>${formation.reste_a_payer}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                } else {
+                    formationsHtml = '<div class="row"><div class="col-md-12"><center>Aucune formation inscrite.</center></div></div>';
+                }
 
-            var detailsHtml = `
-                <div class="modal fade" id="etudiantDetailsModal" tabindex="-1" aria-labelledby="etudiantDetailsModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="etudiantDetailsModalLabel">Détails de l'étudiant</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="row mb-2">
-                                    <div class="col-md-6"><strong>Nom & Prénom:</strong> ${response.etudiant.nomprenom}</div>
-                                    <div class="col-md-6"><strong>Numéro de Téléphone:</strong> ${response.etudiant.phone}</div>
+                var detailsHtml = `
+                    <div class="modal fade" id="etudiantDetailsModal" tabindex="-1" aria-labelledby="etudiantDetailsModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="etudiantDetailsModalLabel">Détails de l'étudiant</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                                <hr>
-                                ${formationsHtml}
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                <div class="modal-body">
+                                    <div class="row mb-2">
+                                        <div class="col-md-6"><strong>Nom & Prénom:</strong> ${response.etudiant.nomprenom}</div>
+                                        <div class="col-md-6"><strong>Numéro de Téléphone:</strong> ${response.etudiant.phone}</div>
+                                    </div>
+                                    <hr>
+                                    ${formationsHtml}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
 
-            // Remove any existing modals before appending a new one
-            $('#etudiantDetailsModal').remove();
-            $('body').append(detailsHtml);
-            $('#etudiantDetailsModal').modal('show');
-        },
-        error: function(xhr, status, error) {
-            iziToast.error({ message: 'Erreur lors de la récupération des détails: ' + error, position: 'topRight' });
-        }
-    });
-}
+                // Remove any existing modals before appending a new one
+                $('#etudiantDetailsModal').remove();
+                $('body').append(detailsHtml);
+                $('#etudiantDetailsModal').modal('show');
+            },
+            error: function(xhr, status, error) {
+                iziToast.error({ message: 'Erreur lors de la récupération des détails: ' + error, position: 'topRight' });
+            }
+        });
+    }
 
 
 
@@ -460,158 +455,172 @@ function fetchEtudiantDetails(etudiantId) {
                 return exists;
             }
 
-            function validateForm(formId, warnings, id = null) {
-    let isValid = true;
-    for (let field in warnings) {
-        const input = $(formId + ' #' + field);
-        const warning = $(warnings[field]);
+    function validateForm(formId, warnings, id = null) {
+        let isValid = true;
+        for (let field in warnings) {
+            const input = $(formId + ' #' + field);
+            const warning = $(warnings[field]);
 
-        if (input.length === 0 && field !== 'genre' && field !== 'new-etudiant-email' && field !== 'etudiant-email') {
-            console.warn(`No input found with ID: ${field}`);
-            continue;
-        }
+            if (input.length === 0 && field !== 'genre' && field !== 'new-etudiant-email' && field !== 'etudiant-email' && field !== 'new-etudiant-wtsp' && field !== 'etudiant-wtsp') {
+                console.warn(`No input found with ID: ${field}`);
+                continue;
+            }
 
-        if (field === 'genre') {
-            if (!$('input[name="genre"]:checked').val()) {
-                warning.text('Ce champ est requis.');
-                isValid = false;
-            } else {
+            if (field === 'genre') {
+                if (!$('input[name="genre"]:checked').val()) {
+                    warning.text('Ce champ est requis.');
+                    isValid = false;
+                } else {
+                    warning.text('');
+                }
+            } else if (input.attr('type') === 'radio') {
+                if (!$('input[name="' + field + '"]:checked').val()) {
+                    warning.text('Ce champ est requis.');
+                    isValid = false;
+                } else {
+                    warning.text('');
+                }
+            } else if (input.val().trim() === '') {
+                if (field !== 'new-etudiant-email' && field !== 'etudiant-email') {
+                    warning.text('Ce champ est requis.');
+                    isValid = false;
+                } else {
+                    warning.text('');
+                }
+            }else if (field === 'datenaissance') {
+                const today = new Date().toISOString().split('T')[0]; // Date d'aujourd'hui au format YYYY-MM-DD
+                if (input.val() > today) {
+                    warning.text('La date de naissance ne peut pas être une date future.');
+                    isValid = false;
+                } else {
+                    warning.text('');
+                }
+            }  else if (field === 'new-etudiant-phone' || field === 'etudiant-phone') {
+                if (!/^\d{8}$/.test(input.val())) {
+                    warning.text('Ce champ doit comporter 8 chiffres.');
+                    isValid = false;
+                } else if (phoneExists(input.val(), id)) {
+                            warning.text('Ce numéro de téléphone existe déjà.');
+                            isValid = false;
+                        } else {
+                    warning.text('');
+                }
+            } else if (field === 'new-etudiant-nni' || field === 'etudiant-nni') {
+                if (!/^\d{10}$/.test(input.val())) {
+                    warning.text('Ce champ doit comporter 10 chiffres.');
+                    isValid = false;
+                } else if (nniExists(input.val(), id)) {
+                    warning.text('Cet NNI existe déjà.');
+                    isValid = false;
+                } else {
+                    warning.text('');
+                }
+            } else if (field === 'new-etudiant-email' || field === 'etudiant-email') {
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(input.val())) {
+                    warning.text('Veuillez entrer une adresse e-mail valide.');
+                    isValid = false;
+                } else if (emailExists(input.val(), id)) {
+                    warning.text('Cet e-mail existe déjà.');
+                    isValid = false;
+                } else {
+                    warning.text('');
+                }
+            } else if ((field === 'new-etudiant-wtsp' || field === 'etudiant-wtsp') && input.val().trim() !== '') {
+                        if (!/^\d+$/.test(input.val())) {
+                            warning.text('Veuillez entrer un numéro WhatsApp valide.');
+                            isValid = false;
+                        } else if (wtspExists(input.val(), id)) {
+                            warning.text('Ce numéro WhatsApp existe déjà.');
+                            isValid = false;
+                        } else {
+                            warning.text('');
+                        }
+                    } else {
                 warning.text('');
             }
-        } else if (field === 'datenaissance') {
-            const today = new Date().toISOString().split('T')[0]; // Date d'aujourd'hui au format YYYY-MM-DD
-            if (input.val() > today) {
-                warning.text('La date de naissance ne peut pas être une date future.');
-                isValid = false;
-            } else {
-                warning.text('');
-            }
-        } else if (input.attr('type') === 'radio') {
-            if (!$('input[name="' + field + '"]:checked').val()) {
-                warning.text('Ce champ est requis.');
-                isValid = false;
-            } else {
-                warning.text('');
-            }
-        } else if (input.val().trim() === '') {
-            if (field !== 'new-etudiant-email' && field !== 'etudiant-email') {
-                warning.text('Ce champ est requis.');
-                isValid = false;
-            } else {
-                warning.text('');
-            }
-        } else if (field === 'new-etudiant-phone' || field === 'etudiant-phone') {
-            if (!/^\d{8}$/.test(input.val())) {
-                warning.text('Ce champ doit comporter 8 chiffres.');
-                isValid = false;
-            } else {
-                warning.text('');
-            }
-        } else if (field === 'new-etudiant-nni' || field === 'etudiant-nni') {
-            if (!/^\d{10}$/.test(input.val())) {
-                warning.text('Ce champ doit comporter 10 chiffres.');
-                isValid = false;
-            } else if (nniExists(input.val(), id)) {
-                warning.text('Cet NNI existe déjà.');
-                isValid = false;
-            } else {
-                warning.text('');
-            }
-        } else if (field === 'new-etudiant-email' || field === 'etudiant-email') {
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailPattern.test(input.val())) {
-                warning.text('Veuillez entrer une adresse e-mail valide.');
-                isValid = false;
-            } else if (emailExists(input.val(), id)) {
-                warning.text('Cet e-mail existe déjà.');
-                isValid = false;
-            } else {
-                warning.text('');
-            }
-        } else {
-            warning.text('');
         }
+        return isValid;
     }
-    return isValid;
-}
-
 
     $('#new-etudiant-phone').on('input', function () {
         $('#new-etudiant-wtsp').val($(this).val());
     });
 
+    
+
     $("#add-new-etudiant").click(function (e) {
-    e.preventDefault();
+        e.preventDefault();
 
-    if (!validateForm('#etudiant-add-form', {
-        'new-etudiant-nni': '#nni-warning',
-        'new-etudiant-nomprenom': '#nomprenom-warning',
-        'new-etudiant-country_id': '#country_id-warning',
-        'new-etudiant-phone': '#phone-warning',
-        'new-etudiant-email': '#email-warning',
-        'datenaissance': '#datenaissance-warning', // Ajout pour date de naissance
-        'genre': '#genre-warning'
-    })) {
-        return;
-    }
+        if (!validateForm('#etudiant-add-form', {
+            'new-etudiant-nni': '#nni-warning',
+            'new-etudiant-nomprenom': '#nomprenom-warning',
+            'new-etudiant-country_id': '#country_id-warning',
+            'new-etudiant-phone': '#phone-warning',
+            'new-etudiant-email': '#email-warning',
+            'genre': '#genre-warning',
+            'new-etudiant-wtsp': '#wtsp-warning',
+            'new-etudiant-dateninscrip': '#dateninscrip-warning'
 
-    let form = $('#etudiant-add-form')[0];
-    let data = new FormData(form);
 
-    $.ajax({
-        url: "{{ route('etudiant.store') }}",
-        type: "POST",
-        data: data,
-        dataType: "JSON",
-        processData: false,
-        contentType: false,
-        success: function (response) {
-            if (response.errors) {
-                var errorMsg = '';
-                $.each(response.errors, function (field, errors) {
-                    $.each(errors, function (index, error) {
-                        // Affichage des erreurs au-dessus des champs
-                        $('#' + field + '-warning').html(error);
+        })) {
+            return;
+        }
+
+        let form = $('#etudiant-add-form')[0];
+        let data = new FormData(form);
+
+        $.ajax({
+            url: "{{ route('etudiant.store') }}",
+            type: "POST",
+            data: data,
+            dataType: "JSON",
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.errors) {
+                    var errorMsg = '';
+                    $.each(response.errors, function (field, errors) {
+                        $.each(errors, function (index, error) {
+                            errorMsg += error + '<br>';
+                        });
                     });
-                });
+                    iziToast.error({
+                        message: errorMsg,
+                        position: 'topRight'
+                    });
+                } else {
+                    iziToast.success({
+                        message: response.success,
+                        position: 'topRight'
+                    });
+                    $('#etudiantAddModal').modal('hide');
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1000);
+                    addStudentToTable(response.etudiant);
+                }
+            },
+            error: function (xhr, status, error) {
+                var errorMsg = '';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errorMsg = xhr.responseJSON.error;
+                } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                    $.each(xhr.responseJSON.errors, function (field, errors) {
+                        $.each(errors, function (index, error) {
+                            errorMsg += error + '<br>';
+                        });
+                    });
+                } else {
+                    errorMsg = 'Une erreur est survenue : ' + error;
+                }
                 iziToast.error({
                     message: errorMsg,
                     position: 'topRight'
                 });
-            } else {
-                iziToast.success({
-                    message: response.success,
-                    position: 'topRight'
-                });
-                $('#etudiantAddModal').modal('hide');
-                setTimeout(function () {
-                    location.reload();
-                }, 1000);
-                addStudentToTable(response.etudiant);
             }
-        },
-        error: function (xhr, status, error) {
-            var errorMsg = '';
-            if (xhr.responseJSON && xhr.responseJSON.error) {
-                errorMsg = xhr.responseJSON.error;
-            } else if (xhr.responseJSON && xhr.responseJSON.errors) {
-                $.each(xhr.responseJSON.errors, function (field, errors) {
-                    $.each(errors, function (index, error) {
-                        // Affichage des erreurs au-dessus des champs
-                        $('#' + field + '-warning').html(error);
-                    });
-                });
-            } else {
-                errorMsg = 'Une erreur est survenue : ' + error;
-            }
-            iziToast.error({
-                message: errorMsg,
-                position: 'topRight'
-            });
-        }
+        });
     });
-});
-
 
     function addStudentToTable(etudiant) {
         let newRow = `<tr>
@@ -822,6 +831,14 @@ function fetchEtudiantDetails(etudiantId) {
             alertElement.style.display = 'none';
         }, 2000);
     }
+
+    function setDefaultDate() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('new-etudiant-dateninscrip').value = today;
+    }
+
+    window.onload = setDefaultDate;
+
 });
 </script>
 

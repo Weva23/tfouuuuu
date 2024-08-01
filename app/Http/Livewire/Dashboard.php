@@ -140,7 +140,7 @@ class Dashboard extends Component
                        ->first();
 
         $this->profmontantPaye = $profpaiements->montant_paye ?? 0;
-        $this->profresteAPayer = $this->profmontantTotalFormationsEnCours - $this->montantPaye;
+        $this->profresteAPayer = $this->profmontantTotalFormationsEnCours - $this->profmontantPaye;
 
         $profdistinctPaiementsTermines = DB::table('paiement_profs')
             ->join('sessions', 'paiement_profs.session_id', '=', 'sessions.id')

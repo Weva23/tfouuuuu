@@ -1,8 +1,6 @@
-// app/Exports/StudentsExport.php
 <?php
 namespace App\Exports;
 
-use App\Models\Sessions;
 use App\Models\Etudiant;
 use App\Models\Paiement;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -14,8 +12,7 @@ class StudentsExport implements FromCollection, WithHeadings, WithMapping, Shoul
 {
     public function collection()
     {
-        return Etudiant::with(['paiements.session.formation', 'paiements.mode'])
-            ->get();
+        return Etudiant::with(['paiements.session.formation', 'paiements.mode'])->get();
     }
 
     public function headings(): array

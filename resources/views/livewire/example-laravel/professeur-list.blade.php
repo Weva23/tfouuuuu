@@ -1,5 +1,5 @@
 
-                            <table class="table align-items-center mb-0">
+<table class="table align-items-center mb-0">
                                 <thead>
                                     <tr>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
@@ -16,6 +16,8 @@
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">EMAIL</th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Portable</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">WhatsApp</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Date d'inscription'</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Date d'enregistrement</th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th>
                                         <th class="text-secondary opacity-7"></th>
                                     </tr>
@@ -24,25 +26,29 @@
                                     @foreach($profs as $prof)
                                     <tr>
                                         <td>{{ $prof->id ?? 'N/A' }}</td>
-                                        <!-- <td><img src="{{ asset('images/'.$prof->image)}}" alt="" width="60px"></td> -->
-                                        <td>
+                                        <td><img src="{{ asset('images/'.$prof->image)}}" alt="" width="60px"></td>
+                                        <!-- <td>
                                             @if ($prof->image)
-                                                <img src="{{ asset('images/' . $prof->image) }}" alt="Image de l'étudiant" width="60px">
+                                                <img src="{{ asset('images/' . $prof->image) }}" alt="" width="60px">
                                             @else
                                                 N/A
                                             @endif
-                                        </td>
+                                        </td> -->
+                                        
                                         <td>{{ $prof->nomprenom ?? 'N/A' }}</td>
                                         <td data-type-id="{{ $prof->type_id }}">{{ $prof->type->type ?? 'N/A' }}</td>
                                         <td data-country-id="{{ $prof->country_id }}">{{ $prof->country->name ?? 'N/A' }}</td>
-                                        <td>{{ $prof->diplome ?? 'N/A' }}</td>
+                                        <td>{{ $prof->diplome  }}</td>
                                         <td>{{ $prof->genre ?? 'N/A' }}</td>
-                                        <td>{{ $prof->lieunaissance ?? 'N/A' }}</td>
-                                        <td>{{ $prof->adress ?? 'N/A' }}</td>
+                                        <td>{{ $prof->lieunaissance  }}</td>
+                                        <td>{{ $prof->adress  }}</td>
                                         <td>{{ $prof->datenaissance ?? 'N/A' }}</td>
-                                        <td>{{ $prof->email ?? 'N/A' }}</td>
+                                        <td>{{ $prof->email  }}</td>
                                         <td>{{ $prof->phone ?? 'N/A' }}</td>
-                                        <td>{{ $prof->wtsp ?? 'N/A' }}</td>
+                                        <td>{{ $prof->wtsp  }}</td>
+                                        <td>{{ $prof->dateninscrip  }}</td>
+                                        <td>{{ $prof->created_at  }}</td>
+
 
                                         <td>
                                             <a href="javascript:void(0)" id="edit-prof" data-id="{{ $prof->id }}" class="btn btn-info"><i class="material-icons opacity-10">border_color</i></a>
