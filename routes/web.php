@@ -209,11 +209,19 @@ Route::get('/paiements', [PaiementController::class, 'index'])->name('paiements.
 Route::get('paiement-management', PaiementController::class)->middleware('auth')->name('paiement-management');
 Route::get('export-paiements', [PaiementController::class, 'exportPaiements'])->name('export.paiements');
 
+Route::get('/sessions/exportProf', [SessionsController::class, 'profExport'])->name('sessions.exportProf');
+Route::get('/sessions/exportStudents', [SessionsController::class, 'exportStudents'])->name('sessions.exportStudents');
+
 
 Route::get('/search6', [SessionsController::class, 'search6'])->name('search6');
+Route::get('/searchProf', [SessionsController::class, 'searchProf'])->name('searchProf');
+
+Route::get('/sessions/exportProf', [SessionsController::class, 'profExport'])->name('sessions.exportProf');
 
 
+Route::get('/sessions/exportStudents', [SessionsController::class, 'exportStudents'])->name('sessions.exportStudents');
 
+Route::get('/search_listetud', [SessionsController::class, 'search_listetud'])->name('search_listetud');
 Route::get('/contenues', [ContenusFormationController::class, 'liste_contenue'])->name('contenue.list');
 Route::post('/contenues', [ContenusFormationController::class, 'store'])->name('contenue.store');
 Route::put('/contenues/{id}', [ContenusFormationController::class, 'update'])->name('contenue.update');

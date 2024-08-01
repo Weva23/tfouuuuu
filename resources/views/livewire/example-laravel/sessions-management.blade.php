@@ -1000,19 +1000,28 @@ $(document).ready(function () {
                     return;
                 }
                 $(document).ready(function () {
-                    $('[data-toggle="tooltip"]').tooltip();
-                });
-                $('#search_bar').on('keyup', function(){
-                    var query = $(this).val();
-                    $.ajax({
-                        url: "{{ route('search_listetud') }}",
-                        type: "GET",
-                        data: {'search_listetud': query},
-                        success: function(data){
-                            $('#sessions-table-etud').html(data.html);
-                        }
-                    });
-                });
+    $('#search_bar').on('keyup', function() {
+        var query = $(this).val();
+        console.log('Search query: ', query);  // Log de la requête de recherche
+
+        $.ajax({
+            url: "{{ route('search_listetud') }}",
+            type: "GET",
+            data: {'search': query},
+            success: function(data) {
+                console.log('Search results: ', data);  // Log des résultats de la recherche
+                $('#sessions-table-etud').html(data.html);
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX error: ', error);  // Log des erreurs AJAX
+            }
+        });
+    });
+});
+
+
+
+
                 let html = `<div class="container-fluid ">
                     <div class="row">
                         <div class="col-12">
@@ -1020,15 +1029,18 @@ $(document).ready(function () {
                                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 d-flex justify-content-between align-items-center">
                                     <div>
                                         <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#etudiantAddModal" onclick="setSessionId(${sessionId})" data-toggle="tooltip" title="Ajouter un étudiant"><i class="material-icons opacity-10">add</i></button>
-                                        <a href="{{ route('sessions.export') }}" class="btn btn-success">Exporter </a>
+                                        <a href="{{ route('sessions.exportStudents') }}" class="btn btn-success">Exporter</a>
 
                                         <button class="btn btn-secondary" onclick="hideStudentContents()">Fermer</button>
                                     </div>
-                                    <form class="d-flex align-items-center ms-auto">
-                                        <div class="input-group input-group-sm" style="width: 250px;">
-                                            <input type="text" name="search_listetud" id="search_bar" class="form-control" placeholder="Rechercher..." value="{{ isset($search_listetud) ? $search_listetud : '' }}">
-                                        </div>
-                                    </form>
+                              <form class="d-flex align-items-center ms-auto">
+    <div class="input-group input-group-sm" style="width: 250px;">
+        <input type="text" name="search" id="search_bar" class="form-control" placeholder="Rechercher..." value="{{ isset($search) ? $search : '' }}">
+    </div>
+</form>
+
+
+
                                 </div>
                                 <div class="card-body px-0 pb-2">
                                     <div class="table-responsive p-0" id="sessions-table-etud">
@@ -1536,6 +1548,22 @@ $(document).ready(function () {
                 $(document).ready(function () {
             $('[data-toggle="tooltip"]').tooltip();
         });
+        $(document).ready(function () {
+    $('#search_prof_bar').on('keyup', function(){
+        var query = $(this).val();
+        $.ajax({
+            url: "{{ route('searchProf') }}",
+            type: "GET",
+            data: {'search': query},
+            success: function(data){
+                $('#sessions-table').html(data.html);
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX error: ', error);
+            }
+        });
+    });
+});
 
         $(document).ready(function () {
             $('[data-toggle="tooltip"]').tooltip();
@@ -1547,9 +1575,19 @@ $(document).ready(function () {
                                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 d-flex justify-content-between align-items-center">
                                     <div>
                                         <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#profAddModal" onclick="setProfSessionId(${sessionId})" data-toggle="tooltip" title="ajouter un professeur"><i class="material-icons opacity-10">add</i></button>
+                                       <a href="{{ route('sessions.exportProf') }}" class="btn btn-success">Exporter Professeurs</a>
+
+
                                         <button class="btn btn-secondary" onclick="hideProfContents()">Fermer</button>
                                     </div>
+                                    <form class="d-flex align-items-center ms-auto">
+    <div class="input-group input-group-sm" style="width: 250px;">
+        <input type="text" name="search_prof" id="search_prof_bar" class="form-control" placeholder="Rechercher professeur...">
+    </div>
+</form>
+</form>
                                 </div>
+                                
                                 <div class="card-body px-0 pb-2">
                                     <div class="table-responsive p-0" id="sessions-table">
                                         <table class="table align-items-center mb=0">

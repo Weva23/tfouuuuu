@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Livewire\ExampleLaravel;
-
+use App\Exports\StudentsExport;
+use App\Exports\ProfessorsExport;
 use PDF;
 use Illuminate\Http\Request;
 use Livewire\Component;
@@ -742,32 +743,33 @@ class SessionsController extends Component
     // }
 
     public function search_listetud(Request $request)
-{
-    if ($request->ajax()) {
-        $search = $request->input('search');
-        
-        $sessions = Sessions::with(['etudiants', 'paiements'])
-            ->where('montant_paye', 'like', "%$search%")
-            ->orWhereHas('etudiants', function ($query) use ($search) {
-                $query->where('nomprenom', 'like', "%$search%")
-                      ->orWhere('phone', 'like', "%$search%")
-                      ->orWhere('wtsp', 'like', "%$search%");
-            })
-            ->orWhereHas('paiements', function ($query) use ($search) {
-                $query->where('prix_reel', 'like', "%$search%")
-                      ->orWhere('montant_paye', 'like', "%$search%")
-                      ->orWhere('note_test', 'like', "%$search%")
-                      ->orWhere('date_paiement', 'like', "%$search%");
-            })
-            ->orWhereHas('mode', function ($query) use ($search) {
-                $query->where('nom', 'like', "%$search%");
-            })
-            ->paginate(10);
-        
-        $view = view('livewire.example-laravel.sessions-management', compact('sessions'))->render();
-        return response()->json(['html' => $view]);
+    {
+        if ($request->ajax()) {
+            $search = $request->input('search');
+    
+            $sessions = Sessions::with(['etudiants', 'etudiants.paiements', 'etudiants.paiements.mode', 'formation'])
+                ->whereHas('etudiants', function ($query) use ($search) {
+                    $query->where('nomprenom', 'like', "%$search%")
+                          ->orWhere('phone', 'like', "%$search%")
+                          ->orWhere('wtsp', 'like', "%$search%");
+                })
+                ->orWhereHas('etudiants.paiements', function ($query) use ($search) {
+                    $query->where('note_test', 'like', "%$search%")
+                          ->orWhere('prix_reel', 'like', "%$search%")
+                          ->orWhere('montant_paye', 'like', "%$search%");
+                })
+                ->orWhereHas('formation', function ($query) use ($search) {
+                    $query->where('prix', 'like', "%$search%");
+                })
+                ->paginate(10);
+    
+            $view = view('livewire.example-laravel.sessions_etud_list', compact('sessions'))->render();
+            return response()->json(['html' => $view]);
+        }
     }
-}
+    
+    
+    
 
     public function search6(Request $request)
     {
@@ -782,6 +784,29 @@ class SessionsController extends Component
             return response()->json(['html' => $view]);
         }
     }
+    public function searchProf(Request $request)
+{
+    if ($request->ajax()) {
+        $search = $request->input('search');
+
+        $sessions = Sessions::with(['professeurs', 'professeurs.paiementprofs.mode'])
+            ->whereHas('professeurs', function ($query) use ($search) {
+                $query->where('nomprenom', 'like', "%$search%")
+                    ->orWhere('phone', 'like', "%$search%")
+                    ->orWhere('wtsp', 'like', "%$search%");
+            })
+            ->orWhereHas('professeurs.paiementprofs', function ($query) use ($search) {
+                $query->where('montant', 'like', "%$search%")
+                    ->orWhere('montant_a_paye', 'like', "%$search%")
+                    ->orWhere('montant_paye', 'like', "%$search%");
+            })
+            ->paginate(10);
+
+        $view = view('livewire.example-laravel.sessions_prof_list', compact('sessions'))->render();
+        return response()->json(['html' => $view]);
+    }
+}
+
 
     public function render()
     {
@@ -792,4 +817,13 @@ class SessionsController extends Component
     {
         return Excel::download(new SessionsExport(), 'sessions.xlsx');
     }
+    public function exportStudents()
+{
+    return Excel::download(new StudentsExport(), 'students.xlsx');
+}
+public function profExport()
+{
+    return Excel::download(new ProfessorsExport(), 'professe.xlsx');
+}
+
 }
