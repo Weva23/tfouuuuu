@@ -1023,156 +1023,158 @@ $(document).ready(function () {
         }
     };
 
-    window.showContents = function(sessionId) {
-        $.ajax({
-            url: `/sessions/${sessionId}/contents`,
-            type: 'GET',
-            success: function(response) {
-                if (response.error) {
-                    alert(response.error);
-                    return;
-                }
-                $(document).ready(function () {
-                    $('#search_bar').on('keyup', function() {
-                        var query = $(this).val();
-                        console.log('Search query: ', query);  // Log de la requête de recherche
+    function formatNumber(number) {
+    return number.toLocaleString('fr-FR');
+}
 
-                        $.ajax({
-                            url: "{{ route('search_listetud') }}",
-                            type: "GET",
-                            data: {'search': query},
-                            success: function(data) {
-                                console.log('Search results: ', data);  // Log des résultats de la recherche
-                                $('#sessions-table-etud').html(data.html);
-                            },
-                            error: function(xhr, status, error) {
-                                console.error('AJAX error: ', error);  // Log des erreurs AJAX
-                            }
-                        });
+window.showContents = function(sessionId) {
+    $.ajax({
+        url: `/sessions/${sessionId}/contents`,
+        type: 'GET',
+        success: function(response) {
+            if (response.error) {
+                alert(response.error);
+                return;
+            }
+
+            $(document).ready(function () {
+                $('#search_bar').on('keyup', function() {
+                    var query = $(this).val();
+                    console.log('Search query: ', query);  // Log de la requête de recherche
+
+                    $.ajax({
+                        url: "{{ route('search_listetud') }}",
+                        type: "GET",
+                        data: {'search': query},
+                        success: function(data) {
+                            console.log('Search results: ', data);  // Log des résultats de la recherche
+                            $('#sessions-table-etud').html(data.html);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('AJAX error: ', error);  // Log des erreurs AJAX
+                        }
                     });
                 });
+            });
 
-                let html = `<div class="container-fluid ">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="card my-4">
-                                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#etudiantAddModal" onclick="setSessionId(${sessionId})" data-toggle="tooltip" title="Ajouter un étudiant"><i class="material-icons opacity-10">add</i></button>
-                                        <a href="{{ route('sessions.exportStudents') }}" class="btn btn-success">Exporter</a>
+            let html = `<div class="container-fluid ">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card my-4">
+                            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#etudiantAddModal" onclick="setSessionId(${sessionId})" data-toggle="tooltip" title="Ajouter un étudiant"><i class="material-icons opacity-10">add</i></button>
+                                    <a href="{{ route('sessions.exportStudents') }}" class="btn btn-success">Exporter</a>
 
-                                        <button class="btn btn-secondary" onclick="hideStudentContents()">Fermer</button>
-                                    </div>
-                              <form class="d-flex align-items-center ms-auto">
-                                <div class="input-group input-group-sm" style="width: 250px;">
-                                    <input type="text" name="search" id="search_bar" class="form-control" placeholder="Rechercher..." value="{{ isset($search) ? $search : '' }}">
+                                    <button class="btn btn-secondary" onclick="hideStudentContents()">Fermer</button>
                                 </div>
-                            </form>
+                          <form class="d-flex align-items-center ms-auto">
+                            <div class="input-group input-group-sm" style="width: 250px;">
+                                <input type="text" name="search" id="search_bar" class="form-control" placeholder="Rechercher..." value="{{ isset($search) ? $search : '' }}">
+                            </div>
+                        </form>
 
 
 
-                                </div>
-                                <div class="card-body px-0 pb-2">
-                                    <div class="table-responsive p-0" id="sessions-table-etud">
-                                        <table class="table align-items-center mb-0">
-                                            <thead>
-                                                <tr>
-                                                    <th>Nom & Prénom</th>
-                                                    <th>Phone</th>
-                                                    <th>WhatsApp</th>
-                                                    <th>Note du Teste</th>
-                                                    <th>Prix Programme</th>
-                                                    <th>Prix Réel</th>
-                                                    <th>Montant Payé</th>
-                                                    <th>Reste à Payer</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>`;
+                            </div>
+                            <div class="card-body px-0 pb-2">
+                                <div class="table-responsive p-0" id="sessions-table-etud">
+                                    <table class="table align-items-center mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Nom & Prénom</th>
+                                                <th>Phone</th>
+                                                <th>WhatsApp</th>
+                                                <th>Note du Teste</th>
+                                                <th>Prix Programme</th>
+                                                <th>Prix Réel</th>
+                                                <th>Montant Payé</th>
+                                                <th>Reste à Payer</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>`;
 
-                if (response.etudiants.length > 0) {
-                    response.etudiants.forEach(function(content) {
-                        let resteAPayer = content.prix_reel - content.montant_paye;
+            if (response.etudiants.length > 0) {
+                response.etudiants.forEach(function(content) {
+                    let resteAPayer = content.prix_reel - content.montant_paye;
 
-                        let buttonClass = resteAPayer <= 0 ? 'btn btn-info' : 'btn btn-dark';
+                    let buttonClass = resteAPayer <= 0 ? 'btn btn-info' : 'btn btn-dark';
 
+                    html += `<tr>
+                        <td>${content.nomprenom}</td>
+                        <td>${content.phone}</td>
+                        <td>${content.wtsp}</td>
+                        <td>${content.note_test}</td>
+                        <td>${formatNumber(content.prix_formation)}</td>
+                        <td>${formatNumber(content.prix_reel)}</td>
+                        <td>${formatNumber(content.montant_paye)}</td>
+                        <td>${formatNumber(resteAPayer)}</td>
 
-                        html += `<tr>
-                            <td>${content.nomprenom}</td>
-                            <td>${content.phone}</td>
-                            <td>${content.wtsp}</td>
-                            <td>${content.note_test}</td>
-                            <td>${content.prix_formation}</td>
-                            <td>${content.prix_reel}</td>
-                            <td>${content.montant_paye}</td>
-                            <td>${resteAPayer}</td>
-
-                            <td>
-                                 <button class="${buttonClass}" onclick="openAddPaymentModal(${content.id}, ${sessionId})" data-toggle="tooltip" title="Ajouter un paiement">
-                                    <i class="material-icons opacity-10">payment</i>
+                        <td>
+                             <button class="${buttonClass}" onclick="openAddPaymentModal(${content.id}, ${sessionId})" data-toggle="tooltip" title="Ajouter un paiement">
+                                <i class="material-icons opacity-10">payment</i>
+                            </button>
+                            <button class="btn btn-danger" onclick="deleteStudentFromSession(${content.id}, ${sessionId})" data-toggle="tooltip" title="Retirer">
+                                <i class="material-icons opacity-10">delete_forever</i>
                                 </button>
-                                <button class="btn btn-danger" onclick="deleteStudentFromSession(${content.id}, ${sessionId})" data-toggle="tooltip" title="Retirer">
-                                    <i class="material-icons opacity-10">delete_forever</i>
-                                    </button>
-                                <a href="/sessions/${sessionId}/generateReceipt/${content.id}" class="btn btn-info" data-toggle="tooltip" title="Imprimer le reçu">
-                                    <i class="material-icons opacity-10">download</i>
-                                </a>
-                            </td>
-                        </tr>`;
-                    });
-                } else {
-                    html += '<tr><td colspan="8" class="text-center">Aucun étudiant trouvé pour cette session.</td></tr>';
-                }
+                            <a href="/sessions/${sessionId}/generateReceipt/${content.id}" class="btn btn-info" data-toggle="tooltip" title="Imprimer le reçu">
+                                <i class="material-icons opacity-10">download</i>
+                            </a>
+                        </td>
+                    </tr>`;
+                });
+            } else {
+                html += '<tr><td colspan="8" class="text-center">Aucun étudiant trouvé pour cette session.</td></tr>';
+            }
 
-                html += `</tbody></table></div></div></div></div></div>`;
-                $('#formationContents').html(html);
-                $('#formationContentContainer').show();
+            html += `</tbody></table></div></div></div></div></div>`;
+            $('#formationContents').html(html);
+            $('#formationContentContainer').show();
 
-                // Display session info and statistics
-                // $('#session-info').html(`<h5>Liste des étudiants de la Formation: "${response.session_nom}" du Programme : ${response.formation_nom} </h5>  Nombre de Étudiants: ${response.total_etudiants} | Total Prix Réel: ${response.total_prix_reel} | Total Montant Payé: ${response.total_montant_paye} | Reste à Payer: ${response.total_reste_a_payer}  `);
-                $('#session-info').html(`
-                    <div class="container-fluid">
-                        <div style="border: 1px solid #ccc; padding: 10px; border-radius: 8px; background-color: #fff; margin-bottom: 10px;">
-                            <h5 style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 10px;">
-                                Liste des étudiants de la Formation: <span style="color: #007bff;">"${response.session_nom}"</span> du Programme : <span style="color: #007bff;">${response.formation_nom}</span>
-                            </h5>
-                            <div style="display: flex; flex-wrap: wrap; gap: 5px;">
-                                <div style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background-color: #fff;">
-                                    <p style="font-size: 12px; color: #555; margin: 0;">
-                                        <strong>Nombre de Étudiants:</strong>
-                                    </p>
-                                    <p style="font-size: 14px; color: #007bff; margin: 5px 0;">${response.total_etudiants}</p>
-                                </div>
-                                <div style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background-color: #fff;">
-                                    <p style="font-size: 12px; color: #555; margin: 0;">
-                                        <strong>Total Prix Réel:</strong>
-                                    </p>
-                                    <p style="font-size: 14px; color: #007bff; margin: 5px 0;">${response.total_prix_reel}</p>
-                                </div>
-                                <div style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background-color: #fff;">
-                                    <p style="font-size: 12px; color: #555; margin: 0;">
-                                        <strong>Total Montant Payé:</strong>
-                                    </p>
-                                    <p style="font-size: 14px; color: #007bff; margin: 5px 0;">${response.total_montant_paye}</p>
-                                </div>
-                                <div style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background-color: #fff;">
-                                    <p style="font-size: 12px; color: #555; margin: 0;">
-                                        <strong>Reste à Payer:</strong>
-                                    </p>
-                                    <p style="font-size: 14px; color: #007bff; margin: 5px 0;">${response.total_reste_a_payer}</p>
-                                </div>
+            $('#session-info').html(`
+                <div class="container-fluid">
+                    <div style="border: 1px solid #ccc; padding: 10px; border-radius: 8px; background-color: #fff; margin-bottom: 10px;">
+                        <h5 style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 10px;">
+                            Liste des étudiants de la Formation: <span style="color: #007bff;">"${response.session_nom}"</span> du Programme : <span style="color: #007bff;">${response.formation_nom}</span>
+                        </h5>
+                        <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                            <div style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background-color: #fff;">
+                                <p style="font-size: 12px; color: #555; margin: 0;">
+                                    <strong>Nombre de Étudiants:</strong>
+                                </p>
+                                <p style="font-size: 14px; color: #007bff; margin: 5px 0;">${response.total_etudiants}</p>
+                            </div>
+                            <div style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background-color: #fff;">
+                                <p style="font-size: 12px; color: #555; margin: 0;">
+                                    <strong>Total Prix Réel:</strong>
+                                </p>
+                                <p style="font-size: 14px; color: #007bff; margin: 5px 0;">${formatNumber(response.total_prix_reel)}</p>
+                            </div>
+                            <div style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background-color: #fff;">
+                                <p style="font-size: 12px; color: #555; margin: 0;">
+                                    <strong>Total Montant Payé:</strong>
+                                </p>
+                                <p style="font-size: 14px; color: #007bff; margin: 5px 0;">${formatNumber(response.total_montant_paye)}</p>
+                            </div>
+                            <div style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background-color: #fff;">
+                                <p style="font-size: 12px; color: #555; margin: 0;">
+                                    <strong>Reste à Payer:</strong>
+                                </p>
+                                <p style="font-size: 14px; color: #007bff; margin: 5px 0;">${formatNumber(response.total_reste_a_payer)}</p>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                `);
-                $('html, body').animate({ scrollTop: $('#formationContentContainer').offset().top }, 'slow');
-            },
-            error: function(xhr, status, error) {
-                alert('Erreur lors du chargement des contenus: ' + error);
-            }
-        });
-    }
+            `);
+            $('html, body').animate({ scrollTop: $('#formationContentContainer').offset().top }, 'slow');
+        },
+        error: function(xhr, status, error) {
+            alert('Erreur lors du chargement des contenus: ' + error);
+        }
+    });
+}
 
     window.hideStudentContents = function() {
         $('#formationContentContainer').hide();
@@ -1613,158 +1615,154 @@ $(document).ready(function () {
     }
 
 
-    window.showProfContents = function(sessionId) {
-        $.ajax({
-            url: `/sessions/${sessionId}/profcontents`,
-            type: 'GET',
-            success: function(response) {
-                if (response.error) {
-                    iziToast.error({ message: response.error, position: 'topRight' });
-                    return;
-                }
-                $(document).ready(function () {
-            $('[data-toggle="tooltip"]').tooltip();
-        });
-        $(document).ready(function () {
-    $('#search_prof_bar').on('keyup', function(){
-        var query = $(this).val();
-        $.ajax({
-            url: "{{ route('searchProf') }}",
-            type: "GET",
-            data: {'search': query},
-            success: function(data){
-                $('#sessions-table').html(data.html);
-            },
-            error: function(xhr, status, error) {
-                console.error('AJAX error: ', error);
+    function formatNumber(number) {
+    return number.toLocaleString('fr-FR');
+}
+
+window.showProfContents = function(sessionId) {
+    $.ajax({
+        url: `/sessions/${sessionId}/profcontents`,
+        type: 'GET',
+        success: function(response) {
+            if (response.error) {
+                iziToast.error({ message: response.error, position: 'topRight' });
+                return;
             }
-        });
-    });
-});
-
-        $(document).ready(function () {
-            $('[data-toggle="tooltip"]').tooltip();
-        });
-                let html = `<div class="container-fluid ">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="card my-4">
-                                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#profAddModal" onclick="setProfSessionId(${sessionId})" data-toggle="tooltip" title="ajouter un professeur"><i class="material-icons opacity-10">add</i></button>
-                                       <a href="{{ route('sessions.exportProf') }}" class="btn btn-success">Exporter Professeurs</a>
-
-
-                                        <button class="btn btn-secondary" onclick="hideProfContents()">Fermer</button>
-                                    </div>
-                                    <form class="d-flex align-items-center ms-auto">
-                                        <div class="input-group input-group-sm" style="width: 250px;">
-                                            <input type="text" name="search_prof" id="search_prof_bar" class="form-control" placeholder="Rechercher professeur...">
-                                        </div>
-                                    </form>
-                                </div>
-                                
-                                <div class="card-body px-0 pb-2">
-                                    <div class="table-responsive p-0" id="sessions-table">
-                                        <table class="table align-items-center mb=0">
-                                            <thead>
-                                                <tr>
-                                                    <th>Nom & Prénom</th>
-                                                    <th>Phone</th>
-                                                    <th>WhatsApp</th>
-                                                    <th>Montant</th>
-                                                    <th>Montant à Payer</th>
-                                                    <th>Montant Payé</th>
-                                                    <th>Reste à Payer</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>`;
-
-                if (response.professeurs && response.professeurs.length > 0) {
-                    response.professeurs.forEach(function(content) {
-                        let montant = content.montant || 0;
-                        let montant_a_paye = content.montant_a_paye || 0;
-                        let montant_paye = content.montant_paye || 0;
-                        let resteAPayer = montant_a_paye - montant_paye;
-
-                        let buttonClass = resteAPayer <= 0 ? 'btn btn-info' : 'btn btn-dark';
-
-
-                        html += `<tr>
-                            <td>${content.nomprenom || 'N/A'}</td>
-                            <td>${content.phone || 'N/A'}</td>
-                            <td>${content.wtsp || 'N/A'}</td>
-                            <td>${montant}</td>
-                            <td>${montant_a_paye}</td>
-                            <td>${montant_paye}</td>
-                            <td>${resteAPayer}</td>
-                           <td>
-                                <button class="${buttonClass}" onclick="openAddProfPaymentModal(${content.id}, ${sessionId})" data-toggle="tooltip" title="Ajouter un paiement">
-                                    <i class="material-icons opacity-10">payment</i>
-                                </button>
-                                <button class="btn btn-danger" onclick="deleteProfFromSession(${content.id}, ${sessionId})" data-toggle="tooltip" title="Retirer">
-                                    <i class="material-icons opacity-10">delete_forever</i>
-                                </button>
-                                <a href="/sessions/${sessionId}/generateProfReceipt/${content.id}" class="btn btn-info" data-toggle="tooltip" title="Imprimer le reçu">
-                                    <i class="material-icons opacity-10">download</i>
-                                </a>
-                            </td>
-
-                        </tr>`;
+            $(document).ready(function () {
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+            $(document).ready(function () {
+                $('#search_prof_bar').on('keyup', function(){
+                    var query = $(this).val();
+                    $.ajax({
+                        url: "{{ route('searchProf') }}",
+                        type: "GET",
+                        data: {'search': query},
+                        success: function(data){
+                            $('#sessions-table').html(data.html);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('AJAX error: ', error);
+                        }
                     });
-                } else {
-                    html += '<tr><td colspan="8" class="text-center">Aucun professeur trouvé pour cette session.</td></tr>';
-                }
+                });
+            });
 
-                html += `</tbody></table></div></div></div></div></div>`;
-                $('#formationProfContents').html(html);
-                $('#formationProfContentContainer').show();
-                // $('#prof-session-info').html(`<h5>Liste des Professeurs de la Formation: ${response.prof_session_nom} du Programme: ${response.prof_formation_nom}</h5> Nombre de Professeurs: ${response.total_profs} | Total Montant à Payer: ${response.prof_total_montant_a_paye} | Total Montant Payé: ${response.prof_total_montant_paye} | Reste à Payer: ${response.prof_total_reste_a_payer}  `);
-                $('#prof-session-info').html(`
-                    <div class="container-fluid ">
-                        <div style="border: 1px solid #ccc; padding: 10px; border-radius: 8px; background-color: #fff; margin-bottom: 10px;">
-                            <h5 style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 10px;">
-                                Liste des Professeurs  Formation: <span style="color: #007bff;">"${response.prof_session_nom}"</span>  Programme : <span style="color: #007bff;">${response.prof_formation_nom}</span>
-                            </h5>
-                            <div style="display: flex; flex-wrap: wrap; gap: 5px;">
-                                <div style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background-color: #fff;">
-                                    <p style="font-size: 12px; color: #555; margin: 0;">
-                                        <strong>Nombre de Professeurs:</strong>
-                                    </p>
-                                    <p style="font-size: 14px; color: #007bff; margin: 5px 0;">${response.total_profs}</p>
+            let html = `<div class="container-fluid ">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card my-4">
+                            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#profAddModal" onclick="setProfSessionId(${sessionId})" data-toggle="tooltip" title="ajouter un professeur"><i class="material-icons opacity-10">add</i></button>
+                                   <a href="{{ route('sessions.exportProf') }}" class="btn btn-success">Exporter Professeurs</a>
+                                    <button class="btn btn-secondary" onclick="hideProfContents()">Fermer</button>
                                 </div>
-                                <div style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background-color: #fff;">
-                                    <p style="font-size: 12px; color: #555; margin: 0;">
-                                        <strong>Total Montant à Payer:</strong>
-                                    </p>
-                                    <p style="font-size: 14px; color: #007bff; margin: 5px 0;">${response.prof_total_montant_a_paye}</p>
-                                </div>
-                                <div style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background-color: #fff;">
-                                    <p style="font-size: 12px; color: #555; margin: 0;">
-                                        <strong>Total Montant Payé:</strong>
-                                    </p>
-                                    <p style="font-size: 14px; color: #007bff; margin: 5px 0;">${response.prof_total_montant_paye}</p>
-                                </div>
-                                <div style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background-color: #fff;">
-                                    <p style="font-size: 12px; color: #555; margin: 0;">
-                                        <strong>Reste à Payer:</strong>
-                                    </p>
-                                    <p style="font-size: 14px; color: #007bff; margin: 5px 0;">${response.prof_total_reste_a_payer}</p>
-                                </div>
+                                <form class="d-flex align-items-center ms-auto">
+                                    <div class="input-group input-group-sm" style="width: 250px;">
+                                        <input type="text" name="search_prof" id="search_prof_bar" class="form-control" placeholder="Rechercher professeur...">
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            <div class="card-body px-0 pb-2">
+                                <div class="table-responsive p-0" id="sessions-table">
+                                    <table class="table align-items-center mb=0">
+                                        <thead>
+                                            <tr>
+                                                <th>Nom & Prénom</th>
+                                                <th>Phone</th>
+                                                <th>WhatsApp</th>
+                                                <th>Montant</th>
+                                                <th>Montant à Payer</th>
+                                                <th>Montant Payé</th>
+                                                <th>Reste à Payer</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>`;
+
+            if (response.professeurs && response.professeurs.length > 0) {
+                response.professeurs.forEach(function(content) {
+                    let montant = content.montant || 0;
+                    let montant_a_paye = content.montant_a_paye || 0;
+                    let montant_paye = content.montant_paye || 0;
+                    let resteAPayer = montant_a_paye - montant_paye;
+
+                    let buttonClass = resteAPayer <= 0 ? 'btn btn-info' : 'btn btn-dark';
+
+                    html += `<tr>
+                        <td>${content.nomprenom || 'N/A'}</td>
+                        <td>${content.phone || 'N/A'}</td>
+                        <td>${content.wtsp || 'N/A'}</td>
+                        <td>${formatNumber(montant)}</td>
+                        <td>${formatNumber(montant_a_paye)}</td>
+                        <td>${formatNumber(montant_paye)}</td>
+                        <td>${formatNumber(resteAPayer)}</td>
+                        <td>
+                            <button class="${buttonClass}" onclick="openAddProfPaymentModal(${content.id}, ${sessionId})" data-toggle="tooltip" title="Ajouter un paiement">
+                                <i class="material-icons opacity-10">payment</i>
+                            </button>
+                            <button class="btn btn-danger" onclick="deleteProfFromSession(${content.id}, ${sessionId})" data-toggle="tooltip" title="Retirer">
+                                <i class="material-icons opacity-10">delete_forever</i>
+                            </button>
+                            <a href="/sessions/${sessionId}/generateProfReceipt/${content.id}" class="btn btn-info" data-toggle="tooltip" title="Imprimer le reçu">
+                                <i class="material-icons opacity-10">download</i>
+                            </a>
+                        </td>
+                    </tr>`;
+                });
+            } else {
+                html += '<tr><td colspan="8" class="text-center">Aucun professeur trouvé pour cette session.</td></tr>';
+            }
+
+            html += `</tbody></table></div></div></div></div></div>`;
+            $('#formationProfContents').html(html);
+            $('#formationProfContentContainer').show();
+            $('#prof-session-info').html(`
+                <div class="container-fluid ">
+                    <div style="border: 1px solid #ccc; padding: 10px; border-radius: 8px; background-color: #fff; margin-bottom: 10px;">
+                        <h5 style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 10px;">
+                            Liste des Professeurs  Formation: <span style="color: #007bff;">"${response.prof_session_nom}"</span>  Programme : <span style="color: #007bff;">${response.prof_formation_nom}</span>
+                        </h5>
+                        <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                            <div style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background-color: #fff;">
+                                <p style="font-size: 12px; color: #555; margin: 0;">
+                                    <strong>Nombre de Professeurs:</strong>
+                                </p>
+                                <p style="font-size: 14px; color: #007bff; margin: 5px 0;">${response.total_profs}</p>
+                            </div>
+                            <div style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background-color: #fff;">
+                                <p style="font-size: 12px; color: #555; margin: 0;">
+                                    <strong>Total Montant à Payer:</strong>
+                                </p>
+                                <p style="font-size: 14px; color: #007bff; margin: 5px 0;">${formatNumber(response.prof_total_montant_a_paye)}</p>
+                            </div>
+                            <div style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background-color: #fff;">
+                                <p style="font-size: 12px; color: #555; margin: 0;">
+                                    <strong>Total Montant Payé:</strong>
+                                </p>
+                                <p style="font-size: 14px; color: #007bff; margin: 5px 0;">${formatNumber(response.prof_total_montant_paye)}</p>
+                            </div>
+                            <div style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background-color: #fff;">
+                                <p style="font-size: 12px; color: #555; margin: 0;">
+                                    <strong>Reste à Payer:</strong>
+                                </p>
+                                <p style="font-size: 14px; color: #007bff; margin: 5px 0;">${formatNumber(response.prof_total_reste_a_payer)}</p>
                             </div>
                         </div>
                     </div>
+                </div>
+            `);
 
-                `);
+            $('html, body').animate({ scrollTop: $('#formationProfContentContainer').offset().top }, 'slow');
+        },
+        error: function(xhr, status, error) {
+            iziToast.error({ message: 'Erreur lors du chargement des contenus: ' + error, position: 'topRight' });
+        }
+    });
+}
 
-                $('html, body').animate({ scrollTop: $('#formationProfContentContainer').offset().top }, 'slow');
-            },
-            error: function(xhr, status, error) {
-                iziToast.error({ message: 'Erreur lors du chargement des contenus: ' + error, position: 'topRight' });
-            }
-        });
-    }
 
     window.hideProfContents = function() {
         $('#formationProfContentContainer').hide();

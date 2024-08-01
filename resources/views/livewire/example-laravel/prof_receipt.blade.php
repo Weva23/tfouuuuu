@@ -92,14 +92,13 @@
 </head>
 <body>
     <div class="container">
-    <img src="public/img/ipf.jpg" class="navbar-brand-img h-100" alt="main_logo">
+        <h3 style="text-align: center;">Institut Pédagogique de Formation <br> et de Recherche Scientifique</h3>
+        <p style="text-align: center;">Tél: 49 00 59 89</p>
         <div class="receipt-number">
-            <p>Reçu No: <span>00250</span></p>
+            <!-- <p>Reçu No: <span>00250</span></p> -->
         </div>
         <div class="header">
             <h1>Reçu</h1>
-            <p>Institut Pédagogique de Formation et de Recherche Scientifique</p>
-            <p>Tél: 4900 5989</p>
         </div>
         <div class="details">
             <p><strong>Nom et Prénom :</strong> {{ $nom_prenom }}</p>
@@ -109,15 +108,16 @@
             <p><strong>Date de Fin :</strong> {{ $date_fin }}</p>
             <p><strong>Mode de Paiement :</strong> {{ $mode_paiement }}</p>
             <p><strong>Type de Paiement :</strong> {{ $type_paiement }}</p>
+            <p><strong>Montant à Payer :</strong> {{ $montant_a_paye }} MRU</p>
             <p><strong>Montant Payé :</strong> {{ $montant_paye }} MRU</p>
             <p><strong>Reste à Payer :</strong> {{ $reste_a_payer }} MRU</p>
             <p><strong>Date de Paiement :</strong> {{ $date_paiement }}</p>
         </div>
         <div class="footer">
             <p><strong>Par :</strong> {{ $par }}</p>
-            <p>Date : {{ $date }}   {{ $heure }}</p>
+            <p>Date : {{ $date }} {{ $heure }}</p>
             <p><strong>Signature :</strong> {{ $signature }}</p>
-        </div>
+        </div><br><br>
     </div>
 </body>
 </html>

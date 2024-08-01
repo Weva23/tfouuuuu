@@ -76,21 +76,17 @@
     </style>
 </head>
 <body>
-    <!-- <div class="container">
-        <div class="header">
-            <h1>Reçu de Paiement Étudiant</h1>
-            <!-- <p>Date : {{ $date }}</p>
-            <p>Heure : {{ $heure }}</p> -->
-        </div> -->
+
         <div class="container">
-    <img src="public/img/ipf.jpg" class="navbar-brand-img h-100" alt="main_logo">
+        <h3 style="text-align: center;">Institut Pédagogique de Formation <br> et de Recherche Scientifique </h3>
+        <p style="text-align: center;">Tél: 49 00 59 89</p>
+    <!-- <img src="public/img/ipf.jpg" class="navbar-brand-img h-100" alt="main_logo"> -->
         <div class="receipt-number">
-            <p>Reçu No: <span>00250</span></p>
+            <!-- <p>Reçu No: <span>00250</span>< /p> -->
         </div>
         <div class="header">
             <h1>Reçu</h1>
-            <p>Institut Pédagogique de Formation et de Recherche Scientifique</p>
-            <p>Tél: 4900 5989</p>
+            
         </div>
         <div class="details" >
             <div style="margin: 20px;">
@@ -100,6 +96,7 @@
                 <p><strong>Date de Début :</strong> {{ $date_debut }}</p>
                 <p><strong>Date de Fin :</strong> {{ $date_fin }}</p>
                 <p><strong>Mode de Paiement :</strong> {{ $Mode_peiment }}</p>
+                <p><strong>Montant à Payer :</strong> {{ $prix_reel }} MRU</p>
                 <p><strong>Montant Payé :</strong> {{ $montant_paye }} MRU</p>
                 <p><strong>Reste à Payer :</strong> {{ $reste_a_payer }} MRU</p>
                 <p><strong>Date de Paiement :</strong> {{ $date_paiement }}</p>
