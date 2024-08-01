@@ -212,11 +212,13 @@ Route::get('export-paiements', [PaiementController::class, 'exportPaiements'])->
 Route::get('/sessions/exportProf', [SessionsController::class, 'profExport'])->name('sessions.exportProf');
 Route::get('/sessions/exportStudents', [SessionsController::class, 'exportStudents'])->name('sessions.exportStudents');
 
+Route::get('/paiementprof/{sessionId}/generateReceipt/{profId}', [PaiementProfController::class, 'generateReceiptProf'])->name('generateProfReceipt');
 
 Route::get('/search6', [SessionsController::class, 'search6'])->name('search6');
 Route::get('/searchProf', [SessionsController::class, 'searchProf'])->name('searchProf');
 
 Route::get('/sessions/exportProf', [SessionsController::class, 'profExport'])->name('sessions.exportProf');
+Route::get('paiementprof/{paiementId}/generateReceipt', [PaiementProfController::class, 'generateReceiptProf'])->name('generateReceiptProf');
 
 
 // Route::get('/sessions/exportStudents', [SessionsController::class, 'exportStudents'])->name('sessions.exportStudents');
