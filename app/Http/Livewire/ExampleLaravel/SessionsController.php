@@ -629,6 +629,7 @@ class SessionsController extends Component
                 'date_fin' => $dateFin->format('d/m/Y'),
                 'mode_paiement' => $modePaiement,
                 'type_paiement' => $typePaiement,
+                'montant_a_paye' => $montantAPaye,
                 'montant_paye' => $montantPaye,
                 'reste_a_payer' => $resteAPayer,
                 'date_paiement' => $datePaiementFormatted,
