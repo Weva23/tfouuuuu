@@ -1064,8 +1064,7 @@ window.showContents = function(sessionId) {
                             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 d-flex justify-content-between align-items-center">
                                 <div>
                                     <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#etudiantAddModal" onclick="setSessionId(${sessionId})" data-toggle="tooltip" title="Ajouter un étudiant"><i class="material-icons opacity-10">add</i></button>
-                                    <a href="{{ route('sessions.exportStudents') }}" class="btn btn-success">Exporter</a>
-
+                                    
                                     <button class="btn btn-secondary" onclick="hideStudentContents()">Fermer</button>
                                 </div>
                           <form class="d-flex align-items-center ms-auto">
@@ -1655,7 +1654,7 @@ window.showProfContents = function(sessionId) {
                             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 d-flex justify-content-between align-items-center">
                                 <div>
                                     <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#profAddModal" onclick="setProfSessionId(${sessionId})" data-toggle="tooltip" title="ajouter un professeur"><i class="material-icons opacity-10">add</i></button>
-                                   <a href="{{ route('sessions.exportProf') }}" class="btn btn-success">Exporter Professeurs</a>
+                                   
                                     <button class="btn btn-secondary" onclick="hideProfContents()">Fermer</button>
                                 </div>
                                 <form class="d-flex align-items-center ms-auto">

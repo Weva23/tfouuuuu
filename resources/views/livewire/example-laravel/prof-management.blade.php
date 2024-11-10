@@ -457,10 +457,7 @@
                 });
                 return exists;
             }
-            // document.addEventListener('DOMContentLoaded', function() {
-            //     const today = new Date().toISOString().split('T')[0];
-            //     document.getElementById('new-prof-dateninscrip').value = today;
-            // });
+
 
             function validateForm(formId, warnings, profId = null) {
                 let isValid = true;
