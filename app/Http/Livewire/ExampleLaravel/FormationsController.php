@@ -8,15 +8,17 @@ use App\Models\Formations;
 use App\Models\ContenusFormation;
 use App\Models\Sessions;
 use App\Exports\FormationsExport;
+use App\Models\Programmes;
 use Maatwebsite\Excel\Facades\Excel;
 
 class FormationsController extends Component
 {
     public function liste_formation()
     {
-        $formations = Formations::orderBy('nom')->paginate(4);
+        $formations = Formations::with('programme')->orderBy('nom')->paginate(4);
         return view('livewire.example-laravel.formations-management', compact('formations'));
     }
+
 
     public function store(Request $request)
     {

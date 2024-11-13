@@ -595,9 +595,9 @@ $(document).ready(function () {
                         position: 'topRight'
                     });
                     $('#etudiantAddModal').modal('hide');
-                    setTimeout(function () {
-                        location.reload();
-                    }, 1000);
+                    // setTimeout(function () {
+                    //     location.reload();
+                    // }, 1000);
                     addStudentToTable(response.etudiant);
                 }
             },

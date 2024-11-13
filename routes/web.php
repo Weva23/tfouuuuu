@@ -16,6 +16,7 @@ use App\Http\Controllers\SearchetudController;
 use App\Http\Livewire\ExampleLaravel\EtudiantController;
 use App\Http\Livewire\ExampleLaravel\ProfesseurController;
 use App\Http\Livewire\ExampleLaravel\FormationsController;
+use App\Http\Livewire\ExampleLaravel\ProgrammeController;
 use App\Http\Livewire\ExampleLaravel\ContenusFormationController;
 use App\Http\Livewire\ExampleLaravel\SessionsController;
 use App\Http\Livewire\ExampleLaravel\PaiementController;
@@ -105,6 +106,28 @@ Route::get('/formations', [FormationsController::class, 'liste_formation']);
 Route::post('/formations/store', [FormationsController::class, 'store']);
 Route::put('/formations/{id}/update', [FormationsController::class, 'update']);
 // Route::delete('/formations/{id}/delete', [FormationsController::class, 'delete_formation']);
+
+
+
+// ##############################################################
+Route::get('/programmes', [ProgrammeController::class, 'liste_programme']);
+Route::get('/programmes', [ProgrammeController::class, 'liste_programme'])->name('programmes.liste');
+Route::get('programme-management', ProgrammeController::class)->middleware('auth')->name('programme-management');
+
+Route::post('/programmes/store', [ProgrammeController::class, 'store']);
+Route::put('/programmes/{id}/update', [ProgrammeController::class, 'update']);
+
+Route::put('programmes/{id}', [ProgrammeController::class, 'update'])->middleware('auth')->name('programmes.update');
+Route::post('/programmes', [ProgrammeController::class, 'store'])->middleware('auth')->name('programmes.store');
+Route::post('/programmes/store', [ProgrammeController::class,'store'])->name('programme.store');
+Route::get('/search_programme', [ProgrammeController::class, 'search1'])->name('search1');
+Route::put('programmes/{id}', [ProgrammeController::class, 'update']);
+Route::delete('/programmes/{id}/delete', [ProgrammeController::class, 'deleteProgramme'])->name('programmes.delete');
+Route::delete('/programmes/{id}/confirm-delete', [ProgrammeController::class, 'confirmDeleteProgramme'])->name('programmes.confirm-delete');
+
+
+
+
 
 
 Route::delete('/formations/{id}', [FormationsController::class, 'delete_formation'])->name('formation.delete');
@@ -292,6 +315,8 @@ Route::get('export/etudiants', [ExportController::class, 'exportEtudiants'])->na
 Route::get('export/formationa', [ExportController::class, 'formationsExport'])->name('formations.export');
 Route::get('export/contenus', [ExportController::class, 'exportContenusFormation'])->name('contenues.export');
 Route::get('export/sessions', [SessionsController::class, 'exportSessions'])->name('sessions.export');
+Route::get('export/Progammes', [ExportController::class, 'programmesExport'])->name('programmes.export');
+
 
 
 Route::get('formations-management', FormationsController::class)->middleware('auth')->name('formations-management');

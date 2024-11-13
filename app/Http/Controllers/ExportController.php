@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\ProfesseurExport;
 use App\Exports\EtudiantExport;
 use App\Exports\formationsExport;
+use App\Exports\programmesExport;
 use App\Exports\ContenusFormationExport;
 use App\Exports\SessionsExport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -23,7 +24,11 @@ class ExportController extends Controller
     }
     public function formationsExport()
     {
-        return Excel::download(new formationsExport, 'programmes.xlsx');
+        return Excel::download(new formationsExport, 'formations.xlsx');
+    }
+    public function programmesExport()
+    {
+        return Excel::download(new programmesExport, 'programmes.xlsx');
     }
     public function exportContenusFormation()
     {

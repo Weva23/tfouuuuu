@@ -2,8 +2,8 @@
     <thead>
         <tr>
             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
-            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Programme</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nom Formation</th>
+            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Formation</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nom Session</th>
             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date début</th>
             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date fin</th>
             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th>

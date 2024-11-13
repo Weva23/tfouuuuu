@@ -57,7 +57,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="etudiantAddModalLabel">Ajouter un étudiant à la formation</h5>
+                <h5 class="modal-title" id="etudiantAddModalLabel">Ajouter un étudiant à la session</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -72,7 +72,7 @@
                 <div id="payment-form" style="display:none;">
                     <div class="row mb-3">
                         <div class="form-group col-md-4">
-                            <label for="formation-price" class="form-label">Prix Programme:</label>
+                            <label for="formation-price" class="form-label">Prix Formation:</label>
                             <input type="text" class="form-control" id="formation-price" readonly>
                         </div>
                         <div class="form-group col-md-4">
@@ -346,7 +346,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Ajouter une nouvelle Formation</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Ajouter une nouvelle Session</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -354,9 +354,9 @@
                     @csrf
                     <div class="row mb-2">
                         <div class="form-group col-md-6">
-                            <label for="formation_id" class="form-label required">Programme</label>
+                            <label for="formation_id" class="form-label required">Formation</label>
                             <select class="form-control" id="new-session-formation_id" name="formation_id">
-                                <option value="">Sélectionner Programme</option>
+                                <option value="">Sélectionner Formation</option>
                                 @foreach ($formations as $formation)
                                     <option value="{{ $formation->id }}">{{ $formation->nom }}</option>
                                 @endforeach
@@ -397,7 +397,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="sessionEditModalLabel">Modifier Formation</h5>
+                <h5 class="modal-title" id="sessionEditModalLabel">Modifier Session</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -406,9 +406,9 @@
                     <input type="hidden" id="session-id" name="id">
                     <div class="row mb-2">
                         <div class="col-md-6">
-                            <label for="session-formation_id" class="form-label required">Programme :</label>
+                            <label for="session-formation_id" class="form-label required">Formation :</label>
                             <select class="form-control" id="session-formation_id" name="formation_id">
-                                <option value="">Sélectionner Programme</option>
+                                <option value="">Sélectionner Formation</option>
                                 @foreach ($formations as $formation)
                                     <option value="{{ $formation->id }}">{{ $formation->nom }}</option>
                                 @endforeach
@@ -1085,7 +1085,7 @@ window.showContents = function(sessionId) {
                                                 <th>Phone</th>
                                                 <th>WhatsApp</th>
                                                 <th>Note du Teste</th>
-                                                <th>Prix Programme</th>
+                                                <th>Prix Formation</th>
                                                 <th>Prix Réel</th>
                                                 <th>Montant Payé</th>
                                                 <th>Reste à Payer</th>
@@ -1135,7 +1135,7 @@ window.showContents = function(sessionId) {
                 <div class="container-fluid">
                     <div style="border: 1px solid #ccc; padding: 10px; border-radius: 8px; background-color: #fff; margin-bottom: 10px;">
                         <h5 style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 10px;">
-                            Liste des étudiants de la Formation: <span style="color: #007bff;">"${response.session_nom}"</span> du Programme : <span style="color: #007bff;">${response.formation_nom}</span>
+                            Liste des étudiants de la Formation: <span style="color: #007bff;">"${response.session_nom}"</span> du Formation : <span style="color: #007bff;">${response.formation_nom}</span>
                         </h5>
                         <div style="display: flex; flex-wrap: wrap; gap: 5px;">
                             <div style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background-color: #fff;">
@@ -1722,7 +1722,7 @@ window.showProfContents = function(sessionId) {
                 <div class="container-fluid ">
                     <div style="border: 1px solid #ccc; padding: 10px; border-radius: 8px; background-color: #fff; margin-bottom: 10px;">
                         <h5 style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 10px;">
-                            Liste des Professeurs  Formation: <span style="color: #007bff;">"${response.prof_session_nom}"</span>  Programme : <span style="color: #007bff;">${response.prof_formation_nom}</span>
+                            Liste des Professeurs  Formation: <span style="color: #007bff;">"${response.prof_session_nom}"</span>  Formation : <span style="color: #007bff;">${response.prof_formation_nom}</span>
                         </h5>
                         <div style="display: flex; flex-wrap: wrap; gap: 5px;">
                             <div style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background-color: #fff;">
