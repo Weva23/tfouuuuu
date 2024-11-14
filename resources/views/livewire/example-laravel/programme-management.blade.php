@@ -126,41 +126,38 @@
 
     <!-- Modal Modifier programme -->
     <div class="modal fade" id="programmeEditModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modifier Programme</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="programme-edit-form">
-                        @csrf
-                        <input type="hidden" id="programme-id" name="id">
-                        <div class="row mb-2">
-                            <div class="col-md-6">
-                                <label for="code" class="form-label required">Code:</label>
-                                <input type="text" class="form-control" id="programme-code" placeholder="Code du programme" name="code" required>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modifier Programme</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="programme-edit-form">
+                    @csrf
+                    <input type="hidden" id="programme-id" name="id">
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <label for="code" class="form-label required">Code:</label>
+                            <input type="text" class="form-control" id="programme-code" placeholder="Code du programme" name="code" required>
                             <div class="text-danger" id="edit-code-warning"></div>
-
-                            </div>
-                            <div class="col-md-6">
-                                <label for="nom" class="form-label required">Nom:</label>
-                                <input type="text" class="form-control" id="programme-nom" placeholder="Nom du programme" name="nom" required>
-                            <div class="text-danger" id="edit-nom-warning"></div>
-
-                            </div>
                         </div>
-                        <br>
-                        
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-info" id="programme-update">Modifier</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                </div>
+                        <div class="col-md-6">
+                            <label for="nom" class="form-label required">Nom:</label>
+                            <input type="text" class="form-control" id="programme-nom" placeholder="Nom du programme" name="nom" required>
+                            <div class="text-danger" id="edit-nom-warning"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" id="programme-update">Modifier</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
             </div>
         </div>
     </div>
+</div>
+
 
 
 
@@ -280,124 +277,113 @@
         });
 
         $('body').on('click', '#edit-programme', function () {
-            var id = $(this).data('id');
-            $.get('/programmes/' + id, function (data) {
-                $('#programme-id').val(data.programme.id);
-                $('#programme-code').val(data.programme.code);
-                $('#programme-nom').val(data.programme.nom);
-                $('#programmeEditModal').modal('show');
+    var id = $(this).data('id'); // Assurez-vous que data-id est bien défini dans le HTML
+    $.get('/programmes/' + id, function (data) {
+        if (data.programme) { // Vérifie si le programme existe
+            $('#programme-id').val(data.programme.id);
+            $('#programme-code').val(data.programme.code);
+            $('#programme-nom').val(data.programme.nom);
+            $('#programmeEditModal').modal('show'); // Affiche le formulaire de modification
+        } else {
+            iziToast.error({
+                title: 'Erreur',
+                message: 'Programme introuvable.',
+                position: 'topRight'
             });
+        }
+    }).fail(function () {
+        iziToast.error({
+            title: 'Erreur',
+            message: 'Impossible de récupérer les données du programme.',
+            position: 'topRight'
         });
+    });
+});
 
-        $('#programme-update').click(function (e) {
-            e.preventDefault();
-            let id = $('#programme-id').val();
-            let form = $('#programme-edit-form')[0];
-            let data = new FormData(form);
-            data.append('_method', 'PUT');
-
-            $.ajax({
-                url: '/programmes/' + id,
-                type: 'POST',
-                data: data,
-                dataType: 'json',
-                processData: false,
-                contentType: false,
-                success: function (response) {
-                    if (response.status == 404) {
-                        iziToast.error({
-                            title: 'Erreur',
-                            message: response.message,
-                            position: 'topRight'
-                        });
-                    } else {
-                        iziToast.success({
-                            title: 'Succès',
-                            message: response.message,
-                            position: 'topRight'
-                        });
-                        $('#programmeEditModal').modal('hide');
-                        setTimeout(function () {
-                            location.reload();
-                        }, 1000);
-                    }
-                }
-            });
-        });
-
-        // Supprimer une programme
-// Supprimer une programme
-$('body').on('click', '#delete-programme', function (e) {
+$('#programme-update').click(function (e) {
     e.preventDefault();
-    var id = $(this).data('id');
+    let id = $('#programme-id').val();
+    let form = $('#programme-edit-form')[0];
+    let data = new FormData(form);
+    data.append('_method', 'PUT');
 
     $.ajax({
-        url: `/programmes/${id}`,
-        type: 'DELETE',
+        url: '/programmes/' + id,
+        type: 'POST',
+        data: data,
         dataType: 'json',
+        processData: false,
+        contentType: false,
         success: function (response) {
-            if (response.status === 400) {
+            if (response.status === 404) {
                 iziToast.error({
+                    title: 'Erreur',
                     message: response.message,
                     position: 'topRight'
                 });
-            } else if (response.status === 200 && response.confirm_deletion) {
-                if (confirm(response.message)) {
-                    // Si l'utilisateur confirme, envoyer une requête pour supprimer la programme et ses contenus
-                    $.ajax({
-                        url: `/programmes/confirm-delete/${id}`,
-                        type: 'DELETE',
-                        dataType: 'json',
-                        success: function (response) {
-                            if (response.status === 200) {
-                                iziToast.success({
-                                    message: response.message,
-                                    position: 'topRight'
-                                });
-                                setTimeout(function () {
-                                    location.reload();
-                                }, 1000);
-                            } else {
-                                iziToast.error({
-                                    message: response.message,
-                                    position: 'topRight'
-                                });
-                            }
-                        },
-                        error: function (xhr, status, error) {
-                            var errorMessage = xhr.status + ': ' + xhr.statusText;
-                            iziToast.error({
-                                title: 'Erreur',
-                                message: 'Une erreur s\'est produite: ' + errorMessage,
-                                position: 'topRight'
-                            });
-                        }
-                    });
-                }
             } else if (response.status === 200) {
                 iziToast.success({
+                    title: 'Succès',
                     message: response.message,
                     position: 'topRight'
                 });
+                $('#programmeEditModal').modal('hide');
                 setTimeout(function () {
                     location.reload();
                 }, 1000);
-            } else {
-                iziToast.error({
-                    message: response.message,
-                    position: 'topRight'
-                });
             }
         },
-        error: function (xhr, status, error) {
-            var errorMessage = xhr.status + ': ' + xhr.statusText;
+        error: function () {
             iziToast.error({
                 title: 'Erreur',
-                message: 'Une erreur s\'est produite: ' + errorMessage,
+                message: 'Une erreur est survenue lors de la mise à jour.',
                 position: 'topRight'
             });
         }
     });
+});
+
+
+        // Supprimer une programme
+// Supprimer une programme
+$('body').on('click', '#delete-programme', function () {
+    var id = $(this).data('id'); // Récupérer l'ID du programme
+
+    // Demander une confirmation
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce programme ?')) {
+        $.ajax({
+            url: '/programmes/' + id,
+            type: 'DELETE',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content') // Ajoute le token CSRF
+            },
+            success: function (response) {
+                if (response.status === 200) {
+                    iziToast.success({
+                        title: 'Succès',
+                        message: response.message,
+                        position: 'topRight'
+                    });
+                    setTimeout(function () {
+                        location.reload(); // Recharger la page
+                    }, 1000);
+                } else {
+                    iziToast.error({
+                        title: 'Erreur',
+                        message: response.message,
+                        position: 'topRight'
+                    });
+                }
+            },
+            error: function () {
+                iziToast.error({
+                    title: 'Erreur',
+                    message: 'Une erreur est survenue lors de la suppression.',
+                    position: 'topRight'
+                });
+            }
+        });
+    }
 });
 
 

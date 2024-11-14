@@ -13,9 +13,14 @@
                 <td><a href="javascript:void(0)" id="show-programme" data-id="{{ $programme->id }}" >{{ $programme->nom }}</a></td>
                 
                 <td>
-                    <a href="javascript:void(0)" id="edit-programme" data-id="{{ $programme->id }}" class="btn btn-info"><i class="material-icons opacity-10">border_color</i></a>
-                    <a href="javascript:void(0)" id="delete-programme" data-id="{{ $programme->id }}" class="btn btn-danger"><i class="material-icons opacity-10">delete</i></a>
-                </td>
+                <a href="javascript:void(0)" id="edit-programme" data-id="{{ $programme->id }}" class="btn btn-info">
+    <i class="material-icons opacity-10">border_color</i>
+</a>
+
+<a href="javascript:void(0)" id="delete-programme" data-id="{{ $programme->id }}" class="btn btn-danger">
+    <i class="material-icons opacity-10">delete</i>
+</a>
+
             </tr>
         @endforeach
     </tbody>
