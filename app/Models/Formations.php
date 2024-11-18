@@ -10,7 +10,7 @@ class Formations extends Model
     use HasFactory;
 
     protected $fillable = [
-        'code', 'nom', 'duree', 'prix'
+       'programme_id', 'code', 'nom', 'duree', 'prix','created_by',
     ];
 
     public function sessions()
@@ -25,5 +25,9 @@ class Formations extends Model
     public function contenusFormation()
     {
         return $this->hasMany(ContenusFormation::class, 'formation_id');
+    }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

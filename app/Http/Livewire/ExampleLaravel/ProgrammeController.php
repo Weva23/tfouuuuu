@@ -5,7 +5,9 @@ namespace App\Http\Livewire\ExampleLaravel;
 use Illuminate\Http\Request;
 use Livewire\Component;
 use App\Models\Programmes;
+use App\Models\Programme;
 use App\Models\Sessions;
+use Illuminate\Support\Facades\Auth;
 use App\Exports\ProgrammesExport;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -13,36 +15,44 @@ class ProgrammeController extends Component
 {
     public function liste_programme()
     {
-        $programmes = Programmes::orderBy('nom')->paginate(4);
+        // $programmes = Programmes::orderBy('nom')->paginate(4);
+        $programmes = Programmes::with('createdBy')->paginate(10);
         return view('livewire.example-laravel.programme-management', compact('programmes'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'code' => 'required|string|max:255',
+        // Valider les données du formulaire
+        $validatedData = $request->validate([
+            'code' => 'required|string|max:255|unique:programmes,code', // Assure l'unicité du code
             'nom' => 'required|string|max:255',
         ]);
     
-        // Vérifiez si le code existe déjà
-        if (Programmes::where('code', $request->code)->exists()) {
-            return response()->json(['error' => 'Le code de Programme existe déjà.'], 409);
-        }
+        // Ajouter l'ID de l'utilisateur connecté
+        $validatedData['created_by'] = Auth::id();
     
-        $programme = new Programmes([
-            'code' => $request->code,
-            'nom' => $request->nom,
-        ]);
+        // Créer le programme
+        $programme = Programmes::create($validatedData);
     
-        if ($programme->save()) {
-            return response()->json(['success' => 'Programme ajoutée avec succès.']);
+        if ($programme) {
+            return response()->json(['success' => 'Programme ajouté avec succès.']);
         } else {
-            return response()->json(['error' => 'Erreur lors de l\'ajout de la programme.'], 400);
+            return response()->json(['error' => 'Erreur lors de l\'ajout du programme.'], 500);
         }
     }
     
         
-    
+    public function show($id)
+{
+    $programme = Programmes::find($id);
+
+    if ($programme) {
+        return response()->json(['programme' => $programme]);
+    } else {
+        return response()->json(['message' => 'Programme introuvable.'], 404);
+    }
+}
+
 
     public function update(Request $request, $id)
     {
@@ -111,22 +121,38 @@ class ProgrammeController extends Component
     {
         return $this->liste_programme();
     }
+    public function destroy($id)
+{
+    $programme = Programmes::find($id);
 
-
-    public function search_programme(Request $request)
-    {
-        if ($request->ajax()) {
-            $search1 = $request->search1;
-            $programmes = Programmes::where(function($query) use ($search1) {
-                $query->where('id', 'like', "%$search1%")
-                    ->orWhere('code', 'like', "%$search1%")
-                    ->orWhere('nom', 'like', "%$search1%");
-            })->paginate(4);
-
-            $view = view('livewire.example-laravel.programmes-list', compact('programmes'))->render();
-            return response()->json(['html' => $view]);
-        }
+    if ($programme) {
+        $programme->delete(); // Supprime le programme
+        return response()->json(['status' => 200, 'message' => 'Programme supprimé avec succès!']);
+    } else {
+        return response()->json(['status' => 404, 'message' => 'Programme non trouvé.']);
     }
+}
+
+
+   public function search_programme(Request $request)
+{
+    if ($request->ajax()) {
+        $search1 = $request->search1;
+
+        // Rechercher uniquement dans le modèle Programme
+        $programmes = Programmes::where(function($query) use ($search1) {
+            $query->where('id', 'like', "%$search1%")
+                  ->orWhere('code', 'like', "%$search1%")
+                  ->orWhere('nom', 'like', "%$search1%");
+        })->paginate(4);
+
+        // Assurez-vous que cette vue est correcte
+        $view = view('livewire.example-laravel.programmes-list', compact('programmes'))->render();
+
+        return response()->json(['html' => $view]);
+    }
+}
+
 
 
 

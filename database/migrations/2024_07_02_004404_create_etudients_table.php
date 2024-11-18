@@ -23,6 +23,7 @@ return new class extends Migration
             $table->integer('phone')->unique();
             $table->integer('wtsp')->unique()->nullable();
             $table->foreignId('country_id')->constrained('countries');
+            $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
         });
     }

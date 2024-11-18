@@ -23,6 +23,7 @@ class CreateProfesseursTable extends Migration
                 $table->integer('wtsp')->unique()->nullable();
                 $table->foreignId('country_id')->constrained('countries');
                 $table->foreignId('type_id')->constrained('typeymntprofs');
+                $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
                 $table->timestamps();
             });
         }

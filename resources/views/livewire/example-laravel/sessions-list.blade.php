@@ -3,7 +3,8 @@
         <tr>
             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Formation</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nom Session</th>
+            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Nom Session</th>
+            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Créé par</th>
             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date début</th>
             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date fin</th>
             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th>
@@ -15,6 +16,7 @@
             <td>{{ $session->id }}</td>
             <td>{{ $session->formation->nom }}</td>
             <td>{{ $session->nom }}</td>
+            <td>{{ $session->createdBy ? $session->createdBy->name ?? $session->createdBy->email : 'Non défini' }}</td>
             <td>{{ $session->date_debut }}</td>
             <td>{{ $session->date_fin }}</td>
             <td>
@@ -23,7 +25,6 @@
                 <button class="btn btn-secondary" onclick="showContents({{ $session->id }})" data-toggle="tooltip" title="Liste des étudiants">
                     <i class="material-icons opacity-10">group</i>
                 </button>
-                
                 <button class="btn btn-secondary" onclick="showProfContents({{ $session->id }})" data-toggle="tooltip" title="Liste des professeurs">
                     <i class="material-icons opacity-10">assignment_ind</i>
                 </button>
@@ -32,4 +33,6 @@
         @endforeach
     </tbody>
 </table>
+
+<!-- Pagination -->
 {{ $sessions->links() }}

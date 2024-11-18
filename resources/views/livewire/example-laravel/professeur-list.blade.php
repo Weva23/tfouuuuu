@@ -18,6 +18,7 @@
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">WhatsApp</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Date d'inscription'</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Date d'enregistrement</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Créé par</th> 
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th>
                                         <th class="text-secondary opacity-7"></th>
                                     </tr>
@@ -48,6 +49,7 @@
                                         <td>{{ $prof->wtsp  }}</td>
                                         <td>{{ $prof->dateninscrip  }}</td>
                                         <td>{{ $prof->created_at  }}</td>
+                                        <td>{{ $prof->createdBy ? $prof->createdBy->name ?? $prof->createdBy->email : 'Non défini' }}</td>
 
 
                                         <td>

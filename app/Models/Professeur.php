@@ -11,7 +11,7 @@ class Professeur extends Model
     use HasFactory;
 
     protected $fillable = [
-        'image', 'nomprenom', 'diplome', 'genre', 'lieunaissance', 'adress', 'datenaissance','dateninscrip', 'email', 'phone', 'wtsp', 'country_id', 'type_id',
+        'image', 'nomprenom', 'diplome', 'genre', 'lieunaissance', 'adress', 'datenaissance','dateninscrip', 'email', 'phone', 'wtsp', 'country_id', 'type_id','created_by'
     ];
 
     public function country()
@@ -32,5 +32,9 @@ class Professeur extends Model
     public function paiementprofs()
     {
         return $this->hasMany(PaiementProf::class, 'prof_id');
+    }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

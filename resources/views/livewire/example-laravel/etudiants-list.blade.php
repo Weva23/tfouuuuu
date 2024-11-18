@@ -16,6 +16,7 @@
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">WhatsApp</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Date d'inscription</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Date d'enregistrement</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Créé par</th> 
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th>
                                         <th class="text-secondary opacity-7"></th>
                                     </tr>
@@ -45,6 +46,7 @@
                                         <td>{{ $etudiant->wtsp   }}</td>
                                         <td>{{ $etudiant->dateninscrip ?? 'N/A' }}</td>
                                         <td>{{ $etudiant->created_at ?? 'N/A' }}</td>
+                                        <td>{{ $etudiant->createdBy ? $etudiant->createdBy->name ?? $etudiant->createdBy->email : 'Non défini' }}</td>
 
                                         <td>
                                             <a href="javascript:void(0)" id="edit-etudiant" data-id="{{ $etudiant->id }}" class="btn btn-info"><i class="material-icons opacity-10">border_color</i></a>

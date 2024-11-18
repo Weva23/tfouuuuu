@@ -116,12 +116,18 @@ Route::get('programme-management', ProgrammeController::class)->middleware('auth
 
 Route::post('/programmes/store', [ProgrammeController::class, 'store']);
 Route::put('/programmes/{id}/update', [ProgrammeController::class, 'update']);
+Route::post('/formations', [FormationsController::class, 'store'])->name('formation.store');
+Route::post('/formation/store', [FormationSController::class, 'store'])->name('formation.store');
 
-Route::put('programmes/{id}', [ProgrammeController::class, 'update'])->middleware('auth')->name('programmes.update');
+Route::get('programmes/{id}', [ProgrammeController::class, 'show'])->middleware('auth')->name('programmes.show');
+Route::delete('programmes/{id}', [ProgrammeController::class, 'destroy'])->middleware('auth')->name('programmes.destroy');
+
 Route::post('/programmes', [ProgrammeController::class, 'store'])->middleware('auth')->name('programmes.store');
 Route::post('/programmes/store', [ProgrammeController::class,'store'])->name('programme.store');
-Route::get('/search_programme', [ProgrammeController::class, 'search1'])->name('search1');
+// Route::get('/search_programme', [ProgrammeController::class, 'search1'])->name('search1');
 Route::put('programmes/{id}', [ProgrammeController::class, 'update']);
+Route::get('search10', [ProgrammeController::class, 'search10'])->name('search10');
+
 Route::delete('/programmes/{id}/delete', [ProgrammeController::class, 'deleteProgramme'])->name('programmes.delete');
 Route::delete('/programmes/{id}/confirm-delete', [ProgrammeController::class, 'confirmDeleteProgramme'])->name('programmes.confirm-delete');
 

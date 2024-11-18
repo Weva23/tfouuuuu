@@ -9,7 +9,7 @@ class Sessions extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['formation_id', 'nom', 'date_debut', 'date_fin'];
+    protected $fillable = ['formation_id', 'nom', 'date_debut', 'date_fin','created_by'];
 
     public function professeurs()
     {
@@ -34,5 +34,9 @@ class Sessions extends Model
     public function paiementprofs()
     {
         return $this->hasMany(PaiementProf::class);
+    }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

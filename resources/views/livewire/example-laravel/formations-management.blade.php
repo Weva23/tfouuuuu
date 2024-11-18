@@ -88,34 +88,45 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Ajouter une nouvelle Programme</h5>
+                <h5 class="modal-title">Ajouter une nouvelle Formation</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="formation-add-form">
                     @csrf
-                    <div class="row mb-2">
+                    <div class="row mb-3">
                         <div class="col-md-6">
-                            <label for="code" class="form-label required">Code:</label>
-                            <input type="text" class="form-control" id="new-formation-code" placeholder="Code du programme" name="code">
+                            <label for="programme_id" class="form-label required">Programme</label>
+                            <select class="form-control" id="new-formation-programme" name="programme_id">
+                                <option value="">Sélectionnez un programme</option>
+                                @foreach ($programmes as $programme)
+                                    <option value="{{ $programme->id }}">{{ $programme->nom }}</option>
+                                @endforeach
+                            </select>
+                            <div class="text-danger" id="programme-warning"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="code" class="form-label required">Code</label>
+                            <input type="text" class="form-control" id="new-formation-code" name="code" placeholder="Entrez le code">
                             <div class="text-danger" id="code-warning"></div>
                         </div>
+                    </div>
+                    <div class="row mb-3">
                         <div class="col-md-6">
-                            <label for="nom" class="form-label required">Nom :</label>
-                            <input type="text" class="form-control" id="new-formation-nom" placeholder="Nom du programme" name="nom">
+                            <label for="nom" class="form-label required">Nom</label>
+                            <input type="text" class="form-control" id="new-formation-nom" name="nom" placeholder="Entrez le nom">
                             <div class="text-danger" id="nom-warning"></div>
                         </div>
-                    </div>
-                    <br>
-                    <div class="row mb-2">
                         <div class="col-md-6">
-                            <label for="duree" class="form-label required">Durée:</label>
-                            <input type="number" class="form-control" id="new-formation-duree" placeholder="Durée" name="duree">
+                            <label for="duree" class="form-label required">Durée</label>
+                            <input type="number" class="form-control" id="new-formation-duree" name="duree" placeholder="Entrez la durée (en jours)">
                             <div class="text-danger" id="duree-warning"></div>
                         </div>
+                    </div>
+                    <div class="row mb-3">
                         <div class="col-md-6">
-                            <label for="prix" class="form-label required">Prix:</label>
-                            <input type="number" class="form-control" id="new-formation-prix" placeholder="Prix" name="prix">
+                            <label for="prix" class="form-label required">Prix</label>
+                            <input type="number" class="form-control" id="new-formation-prix" name="prix" placeholder="Entrez le prix (en €)">
                             <div class="text-danger" id="prix-warning"></div>
                         </div>
                     </div>
@@ -130,61 +141,59 @@
 </div>
 
 
-
-
-
-
-
     <!-- Modal Modifier Formation -->
     <div class="modal fade" id="formationEditModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modifier Programme</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="formation-edit-form">
-                        @csrf
-                        <input type="hidden" id="formation-id" name="id">
-                        <div class="row mb-2">
-                            <div class="col-md-6">
-                                <label for="code" class="form-label required">Code:</label>
-                                <input type="text" class="form-control" id="formation-code" placeholder="Code du programme" name="code" required>
-                            <div class="text-danger" id="edit-code-warning"></div>
-
-                            </div>
-                            <div class="col-md-6">
-                                <label for="nom" class="form-label required">Nom:</label>
-                                <input type="text" class="form-control" id="formation-nom" placeholder="Nom du programme" name="nom" required>
-                            <div class="text-danger" id="edit-nom-warning"></div>
-
-                            </div>
-                        </div>
-                        <br>
-                        <div class="row mb-2">
-                            <div class="col-md-6">
-                                <label for="duree" class="form-label required">Durée:</label>
-                                <input type="number" class="form-control" id="formation-duree" placeholder="Durée" name="duree" required>
-                            <div class="text-danger" id="edit-duree-warning"></div>
-
-                            </div>
-                            <div class="col-md-6">
-                                <label for="prix" class="form-label required">Prix:</label>
-                                <input type="number" class="form-control" id="formation-prix" placeholder="Prix" name="prix" required>
-                            <div class="text-danger" id="edit-prix-warning"></div>
-
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-info" id="formation-update">Modifier</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                </div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modifier Formation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formation-edit-form">
+                    @csrf
+                    <input type="hidden" id="formation-id" name="id">
+                    <div class="mb-3">
+                        <label for="programme_id" class="form-label required">Programme :</label>
+                        <select class="form-control" id="formation-programme" name="programme_id">
+                            <option value="">-- Sélectionnez un programme --</option>
+                            @foreach ($programmes as $programme)
+                                <option value="{{ $programme->id }}">{{ $programme->nom }}</option>
+                            @endforeach
+                        </select>
+                        <div class="text-danger" id="edit-programme-warning"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="code" class="form-label required">Code :</label>
+                        <input type="text" class="form-control" id="formation-code" placeholder="Code" name="code">
+                        <div class="text-danger" id="edit-code-warning"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="nom" class="form-label required">Nom :</label>
+                        <input type="text" class="form-control" id="formation-nom" placeholder="Nom" name="nom">
+                        <div class="text-danger" id="edit-nom-warning"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="duree" class="form-label required">Durée :</label>
+                        <input type="number" class="form-control" id="formation-duree" placeholder="Durée" name="duree">
+                        <div class="text-danger" id="edit-duree-warning"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="prix" class="form-label required">Prix :</label>
+                        <input type="number" class="form-control" id="formation-prix" placeholder="Prix" name="prix">
+                        <div class="text-danger" id="edit-prix-warning"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" id="formation-update">Modifier</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
             </div>
         </div>
     </div>
+</div>
+
+
 
 
     <!-- Modal Ajouter Contenu -->
@@ -318,101 +327,91 @@
         });
        
         // Ajouter une formation
-        $("#add-new-formation").click(function(e) {
-            e.preventDefault();
+       // Ajouter une formation
+// Ajouter une formation
+$("#add-new-formation").click(function (e) {
+    e.preventDefault();
 
-            // Validation des champs requis
-            let isValid = true;
+    // Clear previous validation errors
+    $('.is-invalid').removeClass('is-invalid');
+    $('.text-danger').text('');
 
-            if ($('#new-formation-code').val().trim() === '') {
-                isValid = false;
-                $('#new-formation-code').addClass('is-invalid');
-                $('#code-warning').text('Ce champ est requis.');
-            } else {
-                $('#new-formation-code').removeClass('is-invalid');
-                $('#code-warning').text('');
-            }
+    // Validate form fields
+    let isValid = true;
 
-            if ($('#new-formation-nom').val().trim() === '') {
-                isValid = false;
-                $('#new-formation-nom').addClass('is-invalid');
-                $('#nom-warning').text('Ce champ est requis.');
-            } else {
-                $('#new-formation-nom').removeClass('is-invalid');
-                $('#nom-warning').text('');
-            }
+    if ($('#new-formation-programme').val().trim() === '') {
+        isValid = false;
+        $('#new-formation-programme').addClass('is-invalid');
+        $('#programme-warning').text('Le programme est requis.');
+    }
 
-            if ($('#new-formation-duree').val().trim() === '') {
-                isValid = false;
-                $('#new-formation-duree').addClass('is-invalid');
-                $('#duree-warning').text('Ce champ est requis.');
-            } else {
-                $('#new-formation-duree').removeClass('is-invalid');
-                $('#duree-warning').text('');
-            }
+    if ($('#new-formation-code').val().trim() === '') {
+        isValid = false;
+        $('#new-formation-code').addClass('is-invalid');
+        $('#code-warning').text('Le code est requis.');
+    }
 
-            if ($('#new-formation-prix').val().trim() === '') {
-                isValid = false;
-                $('#new-formation-prix').addClass('is-invalid');
-                $('#prix-warning').text('Ce champ est requis.');
-            } else {
-                $('#new-formation-prix').removeClass('is-invalid');
-                $('#prix-warning').text('');
-            }
+    if ($('#new-formation-nom').val().trim() === '') {
+        isValid = false;
+        $('#new-formation-nom').addClass('is-invalid');
+        $('#nom-warning').text('Le nom est requis.');
+    }
 
-            if (!isValid) {
-                return;
-            }
+    if ($('#new-formation-duree').val().trim() === '') {
+        isValid = false;
+        $('#new-formation-duree').addClass('is-invalid');
+        $('#duree-warning').text('La durée est requise.');
+    }
 
-            let form = $('#formation-add-form')[0];
-            let data = new FormData(form);
+    if ($('#new-formation-prix').val().trim() === '') {
+        isValid = false;
+        $('#new-formation-prix').addClass('is-invalid');
+        $('#prix-warning').text('Le prix est requis.');
+    }
 
-            $.ajax({
-                url: "{{ route('formation.store') }}",
-                type: "POST",
-                data: data,
-                dataType: "json",
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    if (response.error) {
-                        if (response.error === 'Le code de formation existe déjà.') {
-                            $('#new-formation-code').addClass('is-invalid');
-                            $('#code-warning').text(response.error);
-                        } else {
-                            iziToast.error({
-                                title: 'Erreur',
-                                message: response.error,
-                                position: 'topRight'
-                            });
-                        }
-                    } else {
-                        iziToast.success({
-                            title: 'Succès',
-                            message: response.success,
-                            position: 'topRight'
-                        });
-                        $('#formationAddModal').modal('hide');
-                        setTimeout(function() {
-                            location.reload();
-                        }, 1000);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    if (xhr.status === 409) { // Conflit
-                        $('#new-formation-code').addClass('is-invalid');
-                        $('#code-warning').text(xhr.responseJSON.error);
-                    } else {
-                        let errorMsg = 'Une erreur est survenue : ' + error;
-                        iziToast.error({
-                            title: 'Erreur',
-                            message: errorMsg,
-                            position: 'topRight'
-                        });
-                    }
-                }
+    if (!isValid) return;
+
+    // Prepare form data
+    let form = $('#formation-add-form')[0];
+    let formData = new FormData(form);
+
+    // AJAX request
+    $.ajax({
+        url: "{{ route('formation.store') }}",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            iziToast.success({
+                title: 'Succès',
+                message: response.success,
+                position: 'topRight'
             });
-        });
+            $('#formationAddModal').modal('hide');
+            setTimeout(() => location.reload(), 1000);
+        },
+        error: function (xhr) {
+            if (xhr.status === 422) {
+                let errors = xhr.responseJSON.errors;
+                for (let field in errors) {
+                    $(`#new-formation-${field}`).addClass('is-invalid');
+                    $(`#${field}-warning`).text(errors[field][0]);
+                }
+            } else {
+                iziToast.error({
+                    title: 'Erreur',
+                    message: 'Une erreur inattendue est survenue.',
+                    position: 'topRight'
+                });
+            }
+        }
+    });
+});
+
+
+
+
 
         $('body').on('click', '#edit-formation', function () {
             var id = $(this).data('id');
@@ -973,13 +972,14 @@ $('body').on('click', '#delete-formation', function (e) {
                 }
             });
         }
-
+    
         window.setFormationId = function(formationId) {
             $('#formation-id-contenu').val(formationId);
         };
 });
-
-
+    
+    
     </script>
+   
 </body>
 </html>
