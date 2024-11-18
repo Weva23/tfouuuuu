@@ -11,7 +11,7 @@ class Etudiant extends Model
 
     protected $fillable = [
         'image', 'nni', 'nomprenom', 'diplome', 'genre', 'lieunaissance', 'adress',
-        'datenaissance','dateninscrip', 'email', 'phone', 'wtsp', 'country_id',
+        'datenaissance','dateninscrip', 'email', 'phone', 'wtsp', 'country_id','created_by'
     ];
 
     public function country()
@@ -27,5 +27,9 @@ class Etudiant extends Model
     public function paiements()
     {
         return $this->hasMany(Paiement::class);
+    }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

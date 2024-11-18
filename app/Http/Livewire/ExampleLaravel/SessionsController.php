@@ -568,26 +568,34 @@ class SessionsController extends Component
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'nom' => 'required|string',
-            'date_debut' => 'required|date',
-            'date_fin' => 'required|date',
-            'formation_id' => 'required|exists:formations,id',
+{
+    $request->validate([
+        'nom' => 'required|string',
+        'date_debut' => 'required|date',
+        'date_fin' => 'required|date|after_or_equal:date_debut',
+        'formation_id' => 'required|exists:formations,id',
+    ]);
+
+    if (Sessions::where('nom', $request->nom)->exists()) {
+        return response()->json(['error' => 'Le nom de session existe déjà.'], 409);
+    }
+
+    try {
+        // Create the session with the logged-in user's ID
+        $session = Sessions::create([
+            'nom' => $request->nom,
+            'date_debut' => $request->date_debut,
+            'date_fin' => $request->date_fin,
+            'formation_id' => $request->formation_id,
+            'created_by' => Auth::id(),
         ]);
 
-        // Vérifiez si le nom existe déjà
-        if (Sessions::where('nom', $request->nom)->exists()) {
-            return response()->json(['error' => 'Le nom de Formation existe déjà.'], 409);
-        }
-
-        try {
-            $session = Sessions::create($request->all());
-            return response()->json(['success' => 'Formation créée avec succès', 'session' => $session]);
-        } catch (\Throwable $th) {
-            return response()->json(['error' => $th->getMessage()], 500);
-        }
+        return response()->json(['success' => 'Session créée avec succès.', 'session' => $session]);
+    } catch (\Throwable $th) {
+        return response()->json(['error' => 'Erreur lors de la création de la session.', 'details' => $th->getMessage()], 500);
     }
+}
+
 
     public function show($id)
     {

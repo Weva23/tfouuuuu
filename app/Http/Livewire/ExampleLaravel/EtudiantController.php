@@ -8,6 +8,7 @@ use App\Models\Etudiant;
 use App\Models\Country;
 use App\Models\Sessions;
 use App\Models\Paiement;
+use Illuminate\Support\Facades\Auth;
 use App\Models\ModePaiement;
 use Livewire\Component;
 use Maatwebsite\Excel\Facades\Excel;
@@ -292,9 +293,9 @@ public function store(Request $request)
             'phone' => $request->phone,
             'wtsp' => $request->wtsp,
             'country_id' => $request->country_id,
+            'created_by' => Auth::id(), // Enregistre l'utilisateur connecté
         ]);
 
-        // Send email if email is provided
         if ($etudiant->email) {
             Mail::to($etudiant->email)->send(new InscriptionConfirmation($etudiant));
         }

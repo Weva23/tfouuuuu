@@ -5,10 +5,11 @@ namespace App\Http\Livewire\ExampleLaravel;
 use Illuminate\Http\Request;
 use Livewire\Component;
 use App\Models\Formations;
+use App\Models\Programmes;
+use Illuminate\Support\Facades\Auth;
 use App\Models\ContenusFormation;
 use App\Models\Sessions;
 use App\Exports\FormationsExport;
-use App\Models\Programmes;
 use Maatwebsite\Excel\Facades\Excel;
 
 class FormationsController extends Component
@@ -16,39 +17,39 @@ class FormationsController extends Component
     public function liste_formation()
     {
         $formations = Formations::with('programme')->orderBy('nom')->paginate(4);
-        return view('livewire.example-laravel.formations-management', compact('formations'));
+        $programmes = Programmes::all(); // Charger tous les programmes
+        return view('livewire.example-laravel.formations-management', compact('formations', 'programmes'));
     }
-
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'code' => 'required|string|max:255',
-            'nom' => 'required|string|max:255',
-            'duree' => 'required|integer',
-            'prix' => 'required|integer',
+{
+    // Validate the incoming data
+    $validated = $request->validate([
+        'programme_id' => 'required|exists:programmes,id', // Ensure valid programme
+        'code' => 'required|string|max:255|unique:formations,code', // Ensure unique code
+        'nom' => 'required|string|max:255',
+        'duree' => 'required|integer|min:1',
+        'prix' => 'required|numeric|min:0',
+    ]);
+
+    try {
+        // Create the formation
+        $formation = Formations::create([
+            'programme_id' => $validated['programme_id'],
+            'code' => $validated['code'],
+            'nom' => $validated['nom'],
+            'duree' => $validated['duree'],
+            'prix' => $validated['prix'],
+            'created_by' => Auth::id(), // Attach the current user
         ]);
-    
-        // Vérifiez si le code existe déjà
-        if (Formations::where('code', $request->code)->exists()) {
-            return response()->json(['error' => 'Le code de Programme existe déjà.'], 409);
-        }
-    
-        $formation = new Formations([
-            'code' => $request->code,
-            'nom' => $request->nom,
-            'duree' => $request->duree,
-            'prix' => $request->prix,
-        ]);
-    
-        if ($formation->save()) {
-            return response()->json(['success' => 'Formation ajoutée avec succès.']);
-        } else {
-            return response()->json(['error' => 'Erreur lors de l\'ajout de la formation.'], 400);
-        }
+
+        return response()->json(['success' => 'Formation ajoutée avec succès.']);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Erreur lors de l\'ajout de la formation.', 'details' => $e->getMessage()], 500);
     }
+}
+
     
-        
     
 
     public function update(Request $request, $id)
@@ -61,14 +62,15 @@ class FormationsController extends Component
                 'nom' => 'required|string|max:255',
                 'duree' => 'required|integer',
                 'prix' => 'required|integer',
+                'programme_id' => 'required|exists:programmes,id', // Validation du programme
             ]);
 
             $formation->update($request->all());
 
             return response()->json(['status' => 200, 'message' => 'Formation modifiée avec succès!']);
-        } else {
-            return response()->json(['status' => 404, 'message' => 'Formation non trouvée.']);
         }
+
+        return response()->json(['status' => 404, 'message' => 'Formation non trouvée.']);
     }
 
     public function delete_formation($id)
@@ -76,77 +78,12 @@ class FormationsController extends Component
         $formation = Formations::find($id);
 
         if ($formation) {
-            $contenus = ContenusFormation::where('formation_id', $id)->get();
-            $sessions = Sessions::where('formation_id', $id)->get();
-
-            if ($contenus->isNotEmpty() || $sessions->isNotEmpty()) {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Cette formation a des contenus ou des sessions associés et ne peut pas être supprimée.',
-                ]);
-            } else {
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Voulez-vous vraiment supprimer cette formation?',
-                    'confirm_deletion' => true
-                ]);
-            }
-        } else {
-            return response()->json(['status' => 404, 'message' => 'Formation non trouvée.']);
-        }
-    }
-
-    public function confirm_delete_formation($id)
-    {
-        $formation = Formations::find($id);
-
-        if ($formation) {
-            ContenusFormation::where('formation_id', $id)->delete();
-            Sessions::where('formation_id', $id)->delete();
             $formation->delete();
-
-            return response()->json(['status' => 200, 'message' => 'Formation et ses contenus supprimés avec succès.']);
-        } else {
-            return response()->json(['status' => 404, 'message' => 'Formation non trouvée.']);
+            return response()->json(['status' => 200, 'message' => 'Formation supprimée avec succès.']);
         }
+
+        return response()->json(['status' => 404, 'message' => 'Formation non trouvée.']);
     }
-
-
-    // public function delete_formation($id)
-    // {
-    //     $formation = Formations::find($id);
-
-    //     if ($formation) {
-    //         $contenus = ContenusFormation::where('formation_id', $id)->get();
-
-    //         if ($contenus->isNotEmpty()) {
-    //             return response()->json([
-    //                 'status' => 400,
-    //                 'message' => 'Cette formation a des contenus associés. Voulez-vous vraiment la supprimer ainsi que tous ses contenus?',
-    //                 'has_contents' => true
-    //             ]);
-    //         } else {
-    //             $formation->delete();
-    //             return response()->json(['status' => 200, 'message' => 'Formation supprimée avec succès.']);
-    //         }
-    //     } else {
-    //         return response()->json(['status' => 404, 'message' => 'Formation non trouvée.']);
-    //     }
-    // }
-
-    // public function confirm_delete_formation(Request $request, $id)
-    // {
-    //     $formation = Formations::find($id);
-
-    //     if ($formation) {
-    //         ContenusFormation::where('formation_id', $id)->delete();
-    //         $formation->delete();
-
-    //         return response()->json(['status' => 200, 'message' => 'Formation et ses contenus supprimés avec succès.']);
-    //     } else {
-    //         return response()->json(['status' => 404, 'message' => 'Formation non trouvée.']);
-    //     }
-    // }
 
     public function export()
     {
@@ -157,6 +94,7 @@ class FormationsController extends Component
     {
         return $this->liste_formation();
     }
+
 
     public function show($id)
     {

@@ -9,11 +9,13 @@ return new class extends Migration
     {
         Schema::create('formations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('programme_id')->constrained('programmes');
+            // $table->foreignId('programme_id')->constrained('programmes');
             $table->string('code');
             $table->string('nom');
             $table->integer('duree')->unsigned();
             $table->integer('prix');
+            $table->foreignId('programme_id')->constrained('programmes')->onDelete('cascade');
+            $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
         });
     }

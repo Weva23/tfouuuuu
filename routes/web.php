@@ -116,6 +116,8 @@ Route::get('programme-management', ProgrammeController::class)->middleware('auth
 
 Route::post('/programmes/store', [ProgrammeController::class, 'store']);
 Route::put('/programmes/{id}/update', [ProgrammeController::class, 'update']);
+Route::post('/formations', [FormationsController::class, 'store'])->name('formation.store');
+Route::post('/formation/store', [FormationSController::class, 'store'])->name('formation.store');
 
 Route::get('programmes/{id}', [ProgrammeController::class, 'show'])->middleware('auth')->name('programmes.show');
 Route::delete('programmes/{id}', [ProgrammeController::class, 'destroy'])->middleware('auth')->name('programmes.destroy');

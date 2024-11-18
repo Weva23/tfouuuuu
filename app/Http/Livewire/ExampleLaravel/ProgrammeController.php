@@ -5,7 +5,9 @@ namespace App\Http\Livewire\ExampleLaravel;
 use Illuminate\Http\Request;
 use Livewire\Component;
 use App\Models\Programmes;
+use App\Models\Programme;
 use App\Models\Sessions;
+use Illuminate\Support\Facades\Auth;
 use App\Exports\ProgrammesExport;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -13,31 +15,29 @@ class ProgrammeController extends Component
 {
     public function liste_programme()
     {
-        $programmes = Programmes::orderBy('nom')->paginate(4);
+        // $programmes = Programmes::orderBy('nom')->paginate(4);
+        $programmes = Programmes::with('createdBy')->paginate(10);
         return view('livewire.example-laravel.programme-management', compact('programmes'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'code' => 'required|string|max:255',
+        // Valider les données du formulaire
+        $validatedData = $request->validate([
+            'code' => 'required|string|max:255|unique:programmes,code', // Assure l'unicité du code
             'nom' => 'required|string|max:255',
         ]);
     
-        // Vérifiez si le code existe déjà
-        if (Programmes::where('code', $request->code)->exists()) {
-            return response()->json(['error' => 'Le code de Programme existe déjà.'], 409);
-        }
+        // Ajouter l'ID de l'utilisateur connecté
+        $validatedData['created_by'] = Auth::id();
     
-        $programme = new Programmes([
-            'code' => $request->code,
-            'nom' => $request->nom,
-        ]);
+        // Créer le programme
+        $programme = Programmes::create($validatedData);
     
-        if ($programme->save()) {
-            return response()->json(['success' => 'Programme ajoutée avec succès.']);
+        if ($programme) {
+            return response()->json(['success' => 'Programme ajouté avec succès.']);
         } else {
-            return response()->json(['error' => 'Erreur lors de l\'ajout de la programme.'], 400);
+            return response()->json(['error' => 'Erreur lors de l\'ajout du programme.'], 500);
         }
     }
     

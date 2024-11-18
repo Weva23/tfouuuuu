@@ -3,20 +3,26 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateProgrammeTable extends Migration
 {
-    public function up(): void
+    public function up()
     {
-        Schema::create('programmes', function (Blueprint $table) {
-            $table->id();
-            $table->string('code');
-            $table->string('nom');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('programmes')) { // Vérifie si la table n'existe pas
+            Schema::create('programmes', function (Blueprint $table) {
+                $table->id();
+                $table->string('code', 191)->unique(); // Limiter la longueur à 191 caractères pour l'index
+                $table->string('nom');
+                $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
+                $table->timestamps();
+            });
+        }
     }
 
-    public function down(): void
+    public function down()
     {
-        Schema::dropIfExists('programmes');
+        if (Schema::hasTable('programmes')) { // Vérifie si la table existe avant de la supprimer
+            Schema::dropIfExists('programmes');
+        }
     }
-};
+}
+

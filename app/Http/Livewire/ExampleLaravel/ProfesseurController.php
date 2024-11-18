@@ -7,6 +7,7 @@ use App\Models\Professeur;
 use App\Models\Typeymntprofs;
 use App\Models\Country;
 use App\Models\Sessions;
+use Illuminate\Support\Facades\Auth;
 use App\Models\PaiementProf;
 use Livewire\Component;
 use Maatwebsite\Excel\Facades\Excel;
@@ -93,7 +94,7 @@ class ProfesseurController extends Component
             'genre' => 'required|string',
             'lieunaissance' => 'nullable|string',
             'adress' => 'nullable|string',
-            'datenaissance' => 'nullable|date|before_or_equal:today', // Validation ajoutée pour la date
+            'datenaissance' => 'nullable|date|before_or_equal:today',
             'dateninscrip' => 'required|date',
             'email' => 'nullable|email|unique:professeurs,email',
             'phone' => 'required|digits:8|integer|gt:0|unique:professeurs,phone',
@@ -101,7 +102,7 @@ class ProfesseurController extends Component
             'country_id' => 'required|exists:countries,id',
             'type_id' => 'required|exists:typeymntprofs,id',
         ], [
-            'datenaissance.before_or_equal' => 'La date de naissance ne peut pas être une date future.', // Message d'erreur personnalisé
+            'datenaissance.before_or_equal' => 'La date de naissance ne peut pas être une date future.',
         ]);
     
         try {
@@ -125,13 +126,11 @@ class ProfesseurController extends Component
                 'wtsp' => $request->wtsp,
                 'country_id' => $request->country_id,
                 'type_id' => $request->type_id,
+                'created_by' => Auth::id(), // Ajoute l'utilisateur connecté
             ]);
     
-            return response()->json(['success' => 'Professeur créé avec succès', 'prof' => $prof->load('country', 'type')]);
-        } catch (ValidationException $e) {
-            return response()->json(['error' => $e->errors()], 422);
+            return response()->json(['success' => 'Professeur créé avec succès', 'prof' => $prof->load('country', 'type', 'createdBy')]);
         } catch (\Throwable $th) {
-            Log::error('Error creating prof: ', ['error' => $th->getMessage()]);
             return response()->json(['error' => $th->getMessage()], 500);
         }
     }

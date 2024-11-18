@@ -197,84 +197,97 @@
        
         // Ajouter une programme
         $("#add-new-programme").click(function(e) {
-            e.preventDefault();
+    e.preventDefault();
 
-            // Validation des champs requis
-            let isValid = true;
+    // Clear any previous validation errors
+    $('.is-invalid').removeClass('is-invalid');
+    $('.text-danger').text('');
 
-            if ($('#new-programme-code').val().trim() === '') {
-                isValid = false;
-                $('#new-programme-code').addClass('is-invalid');
-                $('#code-warning').text('Ce champ est requis.');
-            } else {
-                $('#new-programme-code').removeClass('is-invalid');
-                $('#code-warning').text('');
-            }
+    // Validate required fields
+    let isValid = true;
 
-            if ($('#new-programme-nom').val().trim() === '') {
-                isValid = false;
-                $('#new-programme-nom').addClass('is-invalid');
-                $('#nom-warning').text('Ce champ est requis.');
-            } else {
-                $('#new-programme-nom').removeClass('is-invalid');
-                $('#nom-warning').text('');
-            }
+    const codeField = $('#new-programme-code');
+    const nomField = $('#new-programme-nom');
+    const codeWarning = $('#code-warning');
+    const nomWarning = $('#nom-warning');
 
-            
+    if (codeField.val().trim() === '') {
+        isValid = false;
+        codeField.addClass('is-invalid');
+        codeWarning.text('Ce champ est requis.');
+    }
 
-            if (!isValid) {
-                return;
-            }
+    if (nomField.val().trim() === '') {
+        isValid = false;
+        nomField.addClass('is-invalid');
+        nomWarning.text('Ce champ est requis.');
+    }
 
-            let form = $('#programme-add-form')[0];
-            let data = new FormData(form);
+    if (!isValid) {
+        return;
+    }
 
-            $.ajax({
-                url: "{{ route('programme.store') }}",
-                type: "POST",
-                data: data,
-                dataType: "json",
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    if (response.error) {
-                        if (response.error === 'Le code de programme existe déjà.') {
-                            $('#new-programme-code').addClass('is-invalid');
-                            $('#code-warning').text(response.error);
-                        } else {
-                            iziToast.error({
-                                title: 'Erreur',
-                                message: response.error,
-                                position: 'topRight'
-                            });
-                        }
-                    } else {
-                        iziToast.success({
-                            title: 'Succès',
-                            message: response.success,
-                            position: 'topRight'
-                        });
-                        $('#programmeAddModal').modal('hide');
-                        setTimeout(function() {
-                            location.reload();
-                        }, 1000);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    if (xhr.status === 409) { // Conflit
-                        $('#new-programme-code').addClass('is-invalid');
-                        $('#code-warning').text(xhr.responseJSON.error);
-                    } else {
-                        let errorMsg = 'Une erreur est survenue : ' + error;
-                        iziToast.error({
-                            title: 'Erreur',
-                            message: errorMsg,
-                            position: 'topRight'
-                        });
-                    }
+    // Prepare form data
+    let form = $('#programme-add-form')[0];
+    let data = new FormData(form);
+
+    // AJAX request to store the programme
+    $.ajax({
+        url: "{{ route('programme.store') }}", // Update the route if necessary
+        type: "POST",
+        data: data,
+        dataType: "json",
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            if (response.error) {
+                // Handle validation errors
+                if (response.error === 'Le code de programme existe déjà.') {
+                    codeField.addClass('is-invalid');
+                    codeWarning.text(response.error);
+                } else {
+                    iziToast.error({
+                        title: 'Erreur',
+                        message: response.error,
+                        position: 'topRight'
+                    });
                 }
-            });
-        });
+            } else {
+                // Success message
+                iziToast.success({
+                    title: 'Succès',
+                    message: response.success,
+                    position: 'topRight'
+                });
+                $('#programmeAddModal').modal('hide');
+                setTimeout(function() {
+                    location.reload();
+                }, 1000);
+            }
+        },
+        error: function(xhr, status, error) {
+            // Handle HTTP errors
+            if (xhr.status === 409) { // Conflict
+                codeField.addClass('is-invalid');
+                codeWarning.text(xhr.responseJSON.error);
+            } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                // Validation errors
+                let errors = xhr.responseJSON.errors;
+                for (let field in errors) {
+                    let warningField = `#${field}-warning`;
+                    $(`#new-programme-${field}`).addClass('is-invalid');
+                    $(warningField).text(errors[field][0]);
+                }
+            } else {
+                iziToast.error({
+                    title: 'Erreur',
+                    message: `Une erreur est survenue : ${error}`,
+                    position: 'topRight'
+                });
+            }
+        }
+    });
+});
 
         $('body').on('click', '#edit-programme', function () {
     var id = $(this).data('id'); // Assurez-vous que data-id est bien défini dans le HTML
