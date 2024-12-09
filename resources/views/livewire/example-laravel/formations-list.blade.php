@@ -23,6 +23,7 @@
 
                 <!-- Action Buttons -->
                 <td class="text-center">
+                <button class="btn btn-primary" onclick="showContents({{ $formation->id }})" data-toggle="tooltip" title="Liste des contenus de la programme"><i class="material-icons opacity-10">chat</i></button>
                     <a href="javascript:void(0)" class="btn btn-info" id="edit-formation" data-id="{{ $formation->id }}" data-toggle="tooltip" title="Modifier">
                         <i class="material-icons opacity-10">border_color</i>
                     </a>

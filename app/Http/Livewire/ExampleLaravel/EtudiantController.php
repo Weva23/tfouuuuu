@@ -43,9 +43,6 @@ class EtudiantController extends Component
         return view('livewire.example-laravel.etudiant-management', compact('etudiants', 'countries'));
     }
 
-
-
-
     public function list_etudencours(Request $request)
     {
         // Récupérer les sessions en cours
@@ -90,65 +87,33 @@ class EtudiantController extends Component
         return view('livewire.example-laravel.etudiant_encours', compact('etudiants', 'sessions'));
     }
 
-
-
-
-
-
-
-
-    // public function getEtudiantDetails($etudiantId)
-    // {
-    //     try {
-    //         $etudiant = Etudiant::findOrFail($etudiantId);
-    //         $formations = $etudiant->sessions->map(function ($session) use ($etudiantId) {
-    //             $paiement = Paiement::where('etudiant_id', $etudiantId)->where('session_id', $session->id)->first();
-    //             return [
-    //                 'nom' => $session->nom,
-    //                 'prix_reel' => $paiement ? $paiement->prix_reel : 0,
-    //                 'montant_paye' => $paiement ? $paiement->montant_paye : 0,
-    //                 'reste_a_payer' => $paiement ? $paiement->prix_reel - $paiement->montant_paye : 0,
-    //             ];
-    //         });
-    
-    //         return response()->json([
-    //             'etudiant' => $etudiant,
-    //             'formations' => $formations,
-    //         ]);
-    //     } catch (ModelNotFoundException $e) {
-    //         return response()->json(['error' => 'Étudiant non trouvé'], 404);
-    //     } catch (\Exception $e) {
-    //         return response()->json(['error' => 'Erreur lors de la récupération des détails: ' . $e->getMessage()], 500);
-    //     }
-    // }
     public function getEtudiantDetails($etudiantId)
-{
-    try {
-        $etudiant = Etudiant::findOrFail($etudiantId);
-        $formations = $etudiant->sessions->map(function ($session) use ($etudiantId) {
-            $paiement = Paiement::where('etudiant_id', $etudiantId)->where('session_id', $session->id)->first();
-            $statut = (now()->between($session->date_debut, $session->date_fin)) ? 'En cours' : 'Terminé';
-            return [
-                'nom' => $session->nom,
-                'prix_reel' => $paiement ? $paiement->prix_reel : 0,
-                'note_test' => $paiement ? $paiement->note_test : 0,
-                'montant_paye' => $paiement ? $paiement->montant_paye : 0,
-                'reste_a_payer' => $paiement ? $paiement->prix_reel - $paiement->montant_paye : 0,
-                'statut' => $statut,
-            ];
-        });
+    {
+        try {
+            $etudiant = Etudiant::findOrFail($etudiantId);
+            $formations = $etudiant->sessions->map(function ($session) use ($etudiantId) {
+                $paiement = Paiement::where('etudiant_id', $etudiantId)->where('session_id', $session->id)->first();
+                $statut = (now()->between($session->date_debut, $session->date_fin)) ? 'En cours' : 'Terminé';
+                return [
+                    'nom' => $session->nom,
+                    'prix_reel' => $paiement ? $paiement->prix_reel : 0,
+                    'note_test' => $paiement ? $paiement->note_test : 0,
+                    'montant_paye' => $paiement ? $paiement->montant_paye : 0,
+                    'reste_a_payer' => $paiement ? $paiement->prix_reel - $paiement->montant_paye : 0,
+                    'statut' => $statut,
+                ];
+            });
 
-        return response()->json([
-            'etudiant' => $etudiant,
-            'formations' => $formations,
-        ]);
-    } catch (ModelNotFoundException $e) {
-        return response()->json(['error' => 'Étudiant non trouvé'], 404);
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'Erreur lors de la récupération des détails: ' . $e->getMessage()], 500);
+            return response()->json([
+                'etudiant' => $etudiant,
+                'formations' => $formations,
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['error' => 'Étudiant non trouvé'], 404);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erreur lors de la récupération des détails: ' . $e->getMessage()], 500);
+        }
     }
-}
-
 
     public function checkNni(Request $request)
     {
@@ -164,7 +129,6 @@ class EtudiantController extends Component
         return response()->json(['exists' => $exists]);
     }
 
-
     public function checkEmail(Request $request)
     {
         $email = $request->input('email');
@@ -178,6 +142,7 @@ class EtudiantController extends Component
 
         return response()->json(['exists' => $exists]);
     }
+
     public function checkPhone(Request $request)
     {
         $query = Etudiant::where('phone', $request->phone);
@@ -198,115 +163,83 @@ class EtudiantController extends Component
         return response()->json(['exists' => $exists]);
     }
 
+    public function store(Request $request)
+    {
+        try {
+            $request->validate([
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'nni' => 'required|digits:10|string|gt:0|unique:etudiants,nni',
+                'nomprenom' => 'required|string',
+                'diplome' => 'nullable|string',
+                'genre' => 'required|string',
+                'lieunaissance' => 'nullable|string',
+                'adress' => 'nullable|string',
+                'datenaissance' => 'nullable|date|before_or_equal:today',
+                'dateninscrip' => 'required|date',
+                'email' => 'nullable|email|unique:etudiants,email',
+                'phone' => 'required|digits:8|integer|gt:0',
+                'wtsp' => 'nullable|integer',
+                'country_id' => 'required|exists:countries,id',
+            ], [
+                'datenaissance.before_or_equal' => 'La date de naissance ne peut pas être une date future.',
+            ]);
 
-    
-//     public function store(Request $request)
-// {
-//     $request->validate([
-//         'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-//         'nni' => 'required|digits:10|string|gt:0|unique:etudiants,nni',
-//         'nomprenom' => 'required|string',
-//         'diplome' => 'nullable|string',
-//         'genre' => 'required|string',
-//         'lieunaissance' => 'nullable|string',
-//         'adress' => 'nullable|string',
-//         'datenaissance' => 'nullable|date|before_or_equal:today', // Validation ajoutée pour la date
-//         'dateninscrip' => 'required|date',
-//         'email' => 'nullable|email|unique:etudiants,email',
-//         'phone' => 'required|digits:8|integer|gt:0',
-//         'wtsp' => 'nullable|integer',
-//         'country_id' => 'required|exists:countries,id',
-//     ], [
-//         'datenaissance.before_or_equal' => 'La date de naissance ne peut pas être une date future.', // Message d'erreur personnalisé
-//     ]);
+            $imageName = null;
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                if ($image->isValid()) {
+                    $imageName = time() . '.' . $image->extension();
+                    $image->move(public_path('images'), $imageName);
+                } else {
+                    throw new \Exception("L'upload de l'image a échoué");
+                }
+            }
 
-//     try {
-//         $imageName = $request->hasFile('image') ? time() . '.' . $request->image->extension() : null;
+            $etudiant = Etudiant::create([
+                'image' => $imageName,
+                'nni' => $request->nni,
+                'nomprenom' => $request->nomprenom,
+                'diplome' => $request->diplome,
+                'genre' => $request->genre,
+                'lieunaissance' => $request->lieunaissance,
+                'adress' => $request->adress,
+                'datenaissance' => $request->datenaissance,
+                'dateninscrip' => $request->dateninscrip,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'wtsp' => $request->wtsp,
+                'country_id' => $request->country_id,
+                'created_by' => Auth::id(),
+            ]);
 
-//         if ($imageName) {
-//             $request->image->move(public_path('images'), $imageName);
-//         }
+            // Load the created_by relationship
+            $etudiant->load('createdBy');
 
-//         $etudiant = Etudiant::create([
-//             'image' => $imageName,
-//             'nni' => $request->nni,
-//             'nomprenom' => $request->nomprenom,
-//             'diplome' => $request->diplome,
-//             'genre' => $request->genre,
-//             'lieunaissance' => $request->lieunaissance,
-//             'adress' => $request->adress,
-//             'datenaissance' => $request->datenaissance,
-//             'dateninscrip' => $request->dateninscrip,
-//             'email' => $request->email,
-//             'phone' => $request->phone,
-//             'wtsp' => $request->wtsp,
-//             'country_id' => $request->country_id,
-//         ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Étudiant ajouté avec succès',
+                'etudiant' => $etudiant
+            ], 200);
 
-//         return response()->json(['success' => 'Étudiant créé avec succès', 'etudiant' => $etudiant]);
-//     } catch (\Throwable $th) {
-//         return response()->json(['error' => $th->getMessage()], 500);
-//     }
-// }
-
-
-
-
-public function store(Request $request)
-{
-    $request->validate([
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        'nni' => 'required|digits:10|string|gt:0|unique:etudiants,nni',
-        'nomprenom' => 'required|string',
-        'diplome' => 'nullable|string',
-        'genre' => 'required|string',
-        'lieunaissance' => 'nullable|string',
-        'adress' => 'nullable|string',
-        'datenaissance' => 'nullable|date|before_or_equal:today',
-        'dateninscrip' => 'required|date',
-        'email' => 'nullable|email|unique:etudiants,email',
-        'phone' => 'required|digits:8|integer|gt:0',
-        'wtsp' => 'nullable|integer',
-        'country_id' => 'required|exists:countries,id',
-    ], [
-        'datenaissance.before_or_equal' => 'La date de naissance ne peut pas être une date future.',
-    ]);
-
-    try {
-        $imageName = $request->hasFile('image') ? time() . '.' . $request->image->extension() : null;
-
-        if ($imageName) {
-            $request->image->move(public_path('images'), $imageName);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur de validation',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            // Si une erreur survient et qu'une image a été uploadée, on la supprime
+            if (isset($imageName) && file_exists(public_path('images/' . $imageName))) {
+                unlink(public_path('images/' . $imageName));
+            }
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de l\'ajout de l\'étudiant',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $etudiant = Etudiant::create([
-            'image' => $imageName,
-            'nni' => $request->nni,
-            'nomprenom' => $request->nomprenom,
-            'diplome' => $request->diplome,
-            'genre' => $request->genre,
-            'lieunaissance' => $request->lieunaissance,
-            'adress' => $request->adress,
-            'datenaissance' => $request->datenaissance,
-            'dateninscrip' => $request->dateninscrip,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'wtsp' => $request->wtsp,
-            'country_id' => $request->country_id,
-            'created_by' => Auth::id(), // Enregistre l'utilisateur connecté
-        ]);
-
-        if ($etudiant->email) {
-            Mail::to($etudiant->email)->send(new InscriptionConfirmation($etudiant));
-        }
-
-        return response()->json(['success' => 'Étudiant créé avec succès et email envoyé', 'etudiant' => $etudiant]);
-    } catch (\Throwable $th) {
-        return response()->json(['error' => $th->getMessage()], 500);
     }
-}
-
-    
 
     public function update(Request $request, $id)
     {
@@ -336,9 +269,14 @@ public function store(Request $request)
 
             $etudiant->update($validated);
 
-            return response()->json(['success' => 'Étudiant modifié avec succès', 'etudiant' => $etudiant->load('country')]);
+            return response()->json([
+                'success' => 'Étudiant modifié avec succès',
+                'etudiant' => $etudiant->load('country')
+            ]);
         } catch (\Throwable $th) {
-            return response()->json(['error' => $th->getMessage()], 500);
+            return response()->json([
+                'error' => $th->getMessage()
+            ], 500);
         }
     }
 
@@ -347,7 +285,10 @@ public function store(Request $request)
         $etudiant = Etudiant::find($id);
     
         if (!$etudiant) {
-            return response()->json(['status' => 404, 'message' => 'Étudiant non trouvé.']);
+            return response()->json([
+                'status' => 404,
+                'message' => 'Étudiant non trouvé.'
+            ]);
         }
     
         $sessionsCount = $etudiant->sessions()->count();
@@ -372,11 +313,17 @@ public function store(Request $request)
         $etudiant = Etudiant::find($id);
     
         if (!$etudiant) {
-            return response()->json(['status' => 404, 'message' => 'Étudiant non trouvé.']);
+            return response()->json([
+                'status' => 404,
+                'message' => 'Étudiant non trouvé.'
+            ]);
         }
     
         $etudiant->delete();
-        return response()->json(['status' => 200, 'message' => 'Étudiant supprimé avec succès.']);
+        return response()->json([
+            'status' => 200,
+            'message' => 'Étudiant supprimé avec succès.'
+        ]);
     }
 
     public function search(Request $request)
@@ -398,7 +345,9 @@ public function store(Request $request)
             })->paginate(4);
 
             $view = view('livewire.example-laravel.etudiants-list', compact('etudiants'))->render();
-            return response()->json(['html' => $view]);
+            return response()->json([
+                'html' => $view
+            ]);
         }
     }
 

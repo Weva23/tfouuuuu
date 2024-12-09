@@ -549,78 +549,107 @@ $(document).ready(function () {
 
     
 
+    $(document).ready(function () {
+    // Click handler for adding a new student
     $("#add-new-etudiant").click(function (e) {
         e.preventDefault();
 
-        if (!validateForm('#etudiant-add-form', {
-            'new-etudiant-nni': '#nni-warning',
-            'new-etudiant-nomprenom': '#nomprenom-warning',
-            'new-etudiant-country_id': '#country_id-warning',
-            'new-etudiant-phone': '#phone-warning',
-            'new-etudiant-email': '#email-warning',
-            'genre': '#genre-warning',
-            'new-etudiant-wtsp': '#wtsp-warning',
-            'new-etudiant-dateninscrip': '#dateninscrip-warning'
+        // Reset warning messages and validation states
+        $('.text-danger').text('');
+        $('input, select').removeClass('is-invalid');
 
-
-        })) {
-            return;
-        }
-
+        // Prepare form data
         let form = $('#etudiant-add-form')[0];
-        let data = new FormData(form);
+        let formData = new FormData(form);
 
+        // AJAX request to store the student
         $.ajax({
-            url: "{{ route('etudiant.store') }}",
+            url: "{{ route('etudiant.store') }}", // Replace with the actual route
             type: "POST",
-            data: data,
-            dataType: "JSON",
+            data: formData,
             processData: false,
             contentType: false,
             success: function (response) {
-                if (response.errors) {
-                    var errorMsg = '';
-                    $.each(response.errors, function (field, errors) {
-                        $.each(errors, function (index, error) {
-                            errorMsg += error + '<br>';
-                        });
-                    });
-                    iziToast.error({
-                        message: errorMsg,
-                        position: 'topRight'
-                    });
-                } else {
+                if (response.success) {
                     iziToast.success({
                         message: response.success,
                         position: 'topRight'
                     });
-                    $('#etudiantAddModal').modal('hide');
-                    // setTimeout(function () {
-                    //     location.reload();
-                    // }, 1000);
+
+                    // Dynamically add the student to the table
                     addStudentToTable(response.etudiant);
+
+                    // Reset the form and close the modal
+                    $('#etudiant-add-form')[0].reset();
+                    $('#etudiantAddModal').modal('hide');
+                } else {
+                    iziToast.error({
+                        message: response.error,
+                        position: 'topRight'
+                    });
                 }
             },
-            error: function (xhr, status, error) {
-                var errorMsg = '';
-                if (xhr.responseJSON && xhr.responseJSON.error) {
-                    errorMsg = xhr.responseJSON.error;
-                } else if (xhr.responseJSON && xhr.responseJSON.errors) {
-                    $.each(xhr.responseJSON.errors, function (field, errors) {
-                        $.each(errors, function (index, error) {
-                            errorMsg += error + '<br>';
-                        });
+            error: function (xhr) {
+                if (xhr.responseJSON && xhr.responseJSON.errors) {
+                    // Display validation errors
+                    $.each(xhr.responseJSON.errors, function (field, messages) {
+                        let warningElement = $(`#${field.replace('.', '-')}-warning`);
+                        let inputElement = $(`#new-etudiant-${field.replace('.', '-')}`);
+                        warningElement.text(messages[0]);
+                        inputElement.addClass('is-invalid');
                     });
                 } else {
-                    errorMsg = 'Une erreur est survenue : ' + error;
+                    iziToast.error({
+                        message: 'Une erreur inattendue est survenue',
+                        position: 'topRight'
+                    });
                 }
-                iziToast.error({
-                    message: errorMsg,
-                    position: 'topRight'
-                });
             }
         });
     });
+
+    // Function to dynamically add a student to the table
+    function addStudentToTable(etudiant) {
+        let tableBody = $("table tbody");
+
+        let newRow = `
+            <tr>
+                <td>${etudiant.id}</td>
+                <td>
+                    ${etudiant.image ? `<img src="/images/${etudiant.image}" alt="Image" width="60px">` : 'N/A'}
+                </td>
+                <td>${etudiant.nni}</td>
+                <td>${etudiant.nomprenom}</td>
+                <td>${etudiant.country ? etudiant.country.name : 'N/A'}</td>
+                <td>${etudiant.diplome ?? 'N/A'}</td>
+                <td>${etudiant.genre}</td>
+                <td>${etudiant.lieunaissance ?? 'N/A'}</td>
+                <td>${etudiant.adress ?? 'N/A'}</td>
+                <td>${etudiant.datenaissance ?? 'N/A'}</td>
+                <td>${etudiant.email ?? 'N/A'}</td>
+                <td>${etudiant.phone}</td>
+                <td>${etudiant.wtsp ?? 'N/A'}</td>
+                <td>${etudiant.dateninscrip}</td>
+                <td>${etudiant.created_at}</td>
+                <td>${etudiant.created_by ? etudiant.created_by.name : 'Non défini'}</td>
+                <td>
+                    <a href="javascript:void(0)" id="edit-etudiant" data-id="${etudiant.id}" class="btn btn-info">
+                        <i class="material-icons opacity-10">border_color</i>
+                    </a>
+                    <a href="javascript:void(0)" id="delete-etudiant" data-id="${etudiant.id}" class="btn btn-danger">
+                        <i class="material-icons opacity-10">delete</i>
+                    </a>
+                    <a href="javascript:void(0)" class="btn btn-info detail-etudiant" data-id="${etudiant.id}" data-toggle="tooltip" title="Détails de l'Étudiant">
+                        <i class="material-icons opacity-10">info</i>
+                    </a>
+                </td>
+            </tr>
+        `;
+
+        tableBody.prepend(newRow); // Add new row to the top of the table
+    }
+});
+
 
     function addStudentToTable(etudiant) {
         let newRow = `<tr>

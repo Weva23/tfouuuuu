@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-
 class ProfesseurController extends Component
 {
     public function liste_prof()
@@ -44,7 +43,7 @@ class ProfesseurController extends Component
                     'statut' => $statut,
                 ];
             });
-    
+
             return response()->json([
                 'prof' => $prof,
                 'formations' => $formations,
@@ -85,33 +84,39 @@ class ProfesseurController extends Component
         $exists = $query->exists();
         return response()->json(['exists' => $exists]);
     }
+
     public function store(Request $request)
     {
-        $request->validate([
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'nomprenom' => 'required|string',
-            'diplome' => 'nullable|string',
-            'genre' => 'required|string',
-            'lieunaissance' => 'nullable|string',
-            'adress' => 'nullable|string',
-            'datenaissance' => 'nullable|date|before_or_equal:today',
-            'dateninscrip' => 'required|date',
-            'email' => 'nullable|email|unique:professeurs,email',
-            'phone' => 'required|digits:8|integer|gt:0|unique:professeurs,phone',
-            'wtsp' => 'nullable|integer|unique:professeurs,wtsp',
-            'country_id' => 'required|exists:countries,id',
-            'type_id' => 'required|exists:typeymntprofs,id',
-        ], [
-            'datenaissance.before_or_equal' => 'La date de naissance ne peut pas être une date future.',
-        ]);
-    
         try {
-            $imageName = $request->hasFile('image') ? time() . '.' . $request->image->extension() : null;
-    
-            if ($imageName) {
-                $request->image->move(public_path('images'), $imageName);
+            $request->validate([
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'nomprenom' => 'required|string',
+                'diplome' => 'nullable|string',
+                'genre' => 'required|string',
+                'lieunaissance' => 'nullable|string',
+                'adress' => 'nullable|string',
+                'datenaissance' => 'nullable|date|before_or_equal:today',
+                'dateninscrip' => 'required|date',
+                'email' => 'nullable|email|unique:professeurs,email',
+                'phone' => 'required|digits:8|integer|gt:0|unique:professeurs,phone',
+                'wtsp' => 'nullable|integer|unique:professeurs,wtsp',
+                'country_id' => 'required|exists:countries,id',
+                'type_id' => 'required|exists:typeymntprofs,id',
+            ], [
+                'datenaissance.before_or_equal' => 'La date de naissance ne peut pas être une date future.',
+            ]);
+
+            $imageName = null;
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                if ($image->isValid()) {
+                    $imageName = time() . '.' . $image->extension();
+                    $image->move(public_path('images'), $imageName);
+                } else {
+                    throw new \Exception("L'upload de l'image a échoué");
+                }
             }
-    
+
             $prof = Professeur::create([
                 'image' => $imageName,
                 'nomprenom' => $request->nomprenom,
@@ -126,15 +131,37 @@ class ProfesseurController extends Component
                 'wtsp' => $request->wtsp,
                 'country_id' => $request->country_id,
                 'type_id' => $request->type_id,
-                'created_by' => Auth::id(), // Ajoute l'utilisateur connecté
+                'created_by' => Auth::id(),
             ]);
-    
-            return response()->json(['success' => 'Professeur créé avec succès', 'prof' => $prof->load('country', 'type', 'createdBy')]);
-        } catch (\Throwable $th) {
-            return response()->json(['error' => $th->getMessage()], 500);
+
+            // Load relationships for frontend display
+            $prof->load('country', 'type', 'createdBy');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Professeur ajouté avec succès',
+                'prof' => $prof
+            ], 200);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur de validation',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            // Si une erreur survient et qu'une image a été uploadée, on la supprime
+            if (isset($imageName) && file_exists(public_path('images/' . $imageName))) {
+                unlink(public_path('images/' . $imageName));
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de l\'ajout du professeur',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
-    
 
     public function update(Request $request, $id)
     {
@@ -186,20 +213,20 @@ class ProfesseurController extends Component
     public function deleteProfesseur($id)
     {
         $professeur = Professeur::find($id);
-    
+
         if (!$professeur) {
             return response()->json(['status' => 404, 'message' => 'Professeur non trouvé.']);
         }
-    
+
         $sessionsCount = $professeur->sessions()->count();
-    
+
         if ($sessionsCount > 0) {
             return response()->json([
                 'status' => 400,
                 'message' => 'Ce professeur est associé à une ou plusieurs formations et ne peut pas être supprimé.'
             ]);
         }
-    
+
         // Si aucune relation n'existe, confirmation de suppression
         return response()->json([
             'status' => 200,
@@ -207,15 +234,15 @@ class ProfesseurController extends Component
             'confirm_deletion' => true
         ]);
     }
-    
+
     public function confirmDeleteProfesseur($id)
     {
         $professeur = Professeur::find($id);
-    
+
         if (!$professeur) {
             return response()->json(['status' => 404, 'message' => 'Professeur non trouvé.']);
         }
-    
+
         $professeur->delete();
         return response()->json(['status' => 200, 'message' => 'Professeur supprimé avec succès.']);
     }

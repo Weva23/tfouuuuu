@@ -539,74 +539,101 @@
                 $('#new-prof-wtsp').val($(this).val());
             });
 
-            $("#add-new-prof").click(function(e){
-                e.preventDefault();
-                if (!validateForm('#prof-add-form', {
-                    'new-prof-nomprenom': '#nomprenom-warning',
-                    'new-prof-country_id': '#country_id-warning',
-                    'new-prof-type_id': '#type_id-warning',
-                    'genre': '#genre-warning',
-                    'new-prof-phone': '#phone-warning',
-                    'new-prof-email': '#email-warning',
-                    'new-prof-wtsp': '#wtsp-warning',
-                    'datenaissance': '#datenaissance-warning', // Ajout pour date de naissance
-                    'new-prof-dateninscrip': '#dateninscrip-warning'
-                })) {
-                    return;
-                }
+            $("#add-new-prof").click(function (e) {
+    e.preventDefault();
 
-                let form = $('#prof-add-form')[0];
-                let data = new FormData(form);
+    // Reset warning messages
+    $('.text-danger').text('');
+    $('input, select').removeClass('is-invalid');
 
-                $.ajax({
-                    url: "{{ route('prof.store') }}",
-                    type: "POST",
-                    data: data,
-                    dataType: "JSON",
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        if (response.error) {
-                            let errorMsg = '';
-                            $.each(response.error, function(field, errors) {
-                                $.each(errors, function(index, error) {
-                                    errorMsg += error + '<br>';
-                                });
-                            });
-                            iziToast.error({
-                                message: errorMsg,
-                                position: 'topRight'
-                            });
-                        } else {
-                            iziToast.success({
-                                message: response.success,
-                                position: 'topRight'
-                            });
-                            $('#profAddModal').modal('hide');
-                            setTimeout(function () {
-                                location.reload();
-                            }, 1000);
-                            addStudentToTable(response.prof);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        let errorMsg = '';
-                        if (xhr.responseJSON && xhr.responseJSON.errors) {
-                            $.each(xhr.responseJSON.errors, function(field, errors) {
-                                $.each(errors, function(index, error) {
-                                    errorMsg += error + '<br>';
-                                });
-                            });
-                        } else {
-                            errorMsg = 'Une erreur est survenue : ' + error;
-                        }
-                        iziToast.error({
-                            message: errorMsg,
-                            position: 'topRight'
-                        });
-                    }
+    // Prepare form data
+    let form = $('#prof-add-form')[0];
+    let formData = new FormData(form);
+
+    // AJAX request to store the professor
+    $.ajax({
+        url: "{{ route('prof.store') }}",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            if (response.success) {
+                iziToast.success({
+                    message: 'Professeur ajouté avec succès',
+                    position: 'topRight'
                 });
-            });
+
+                // Add the professor to the table dynamically
+                addProfessorToTable(response.prof);
+
+                // Reset the form and close the modal
+                $('#prof-add-form')[0].reset();
+                $('#profAddModal').modal('hide');
+            } else {
+                iziToast.error({
+                    message: response.error,
+                    position: 'topRight'
+                });
+            }
+        },
+        error: function (xhr) {
+            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                // Show validation errors
+                $.each(xhr.responseJSON.errors, function (field, messages) {
+                    $(`#${field.replace('.', '-')}-warning`).text(messages[0]);
+                    $(`#new-prof-${field.replace('.', '-')}`).addClass('is-invalid');
+                });
+            } else {
+                iziToast.error({
+                    message: 'Une erreur inattendue est survenue',
+                    position: 'topRight'
+                });
+            }
+        }
+    });
+});
+
+// Add professor dynamically to the table
+function addProfessorToTable(prof) {
+    let tableBody = $("table tbody");
+
+    let newRow = `
+        <tr>
+            <td>${prof.id}</td>
+            <td>
+                ${prof.image ? `<img src="/images/${prof.image}" alt="Image" width="60px">` : 'N/A'}
+            </td>
+            <td>${prof.nomprenom}</td>
+            <td>${prof.country ? prof.country.name : 'N/A'}</td>
+            <td>${prof.type ? prof.type.type : 'N/A'}</td>
+            <td>${prof.diplome ?? 'N/A'}</td>
+            <td>${prof.genre}</td>
+            <td>${prof.lieunaissance ?? 'N/A'}</td>
+            <td>${prof.adress ?? 'N/A'}</td>
+            <td>${prof.datenaissance ?? 'N/A'}</td>
+            <td>${prof.email ?? 'N/A'}</td>
+            <td>${prof.phone}</td>
+            <td>${prof.wtsp ?? 'N/A'}</td>
+            <td>${prof.dateninscrip}</td>
+            <td>${prof.created_at}</td>
+            <td>${prof.created_by ? prof.created_by.name : 'Non défini'}</td>
+            <td>
+                <a href="javascript:void(0)" id="edit-prof" data-id="${prof.id}" class="btn btn-info">
+                    <i class="material-icons opacity-10">border_color</i>
+                </a>
+                <a href="javascript:void(0)" id="delete-prof" data-id="${prof.id}" class="btn btn-danger">
+                    <i class="material-icons opacity-10">delete</i>
+                </a>
+                <a href="javascript:void(0)" class="btn btn-info detail-prof" data-id="${prof.id}" data-toggle="tooltip" title="Détails du Professeur">
+                    <i class="material-icons opacity-10">info</i>
+                </a>
+            </td>
+        </tr>
+    `;
+
+    tableBody.prepend(newRow); // Add new row to the top of the table
+}
 
             $('body').on('click', '#edit-prof', function () {
                 var tr = $(this).closest('tr');
